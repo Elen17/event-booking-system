@@ -31,11 +31,20 @@ CREATE TABLE IF NOT EXISTS user_role
     name VARCHAR(255) NOT NULL UNIQUE
 );
 
+INSERT INTO user_role (name)
+VALUES ('ADMIN'),
+       ('USER');
+
 CREATE TABLE IF NOT EXISTS event_status
 (
     id   SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL UNIQUE
 );
+
+INSERT INTO event_status (name)
+VALUES ('PLANNED'),
+       ('CANCELLED'),
+       ('COMPLETED');
 
 CREATE TABLE IF NOT EXISTS event_type
 (
@@ -43,11 +52,25 @@ CREATE TABLE IF NOT EXISTS event_type
     name VARCHAR(255) NOT NULL UNIQUE
 );
 
+INSERT INTO event_type (name)
+VALUES ('Concert'),
+       ('Sport'),
+       ('Festival'),
+       ('Cinema'),
+       ('Theater'),
+       ('Sports'),
+       ('Opera and Ballet');
+
 CREATE TABLE IF NOT EXISTS seat_status
 (
     id   SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL UNIQUE
 );
+
+INSERT INTO seat_status (name)
+VALUES ('AVAILABLE'),
+       ('RESERVED'),
+       ('PURCHASED');
 
 CREATE TABLE IF NOT EXISTS app_user
 (
