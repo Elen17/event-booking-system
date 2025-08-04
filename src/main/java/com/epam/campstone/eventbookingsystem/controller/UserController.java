@@ -1,4 +1,98 @@
 package com.epam.campstone.eventbookingsystem.controller;
 
+import com.epam.campstone.eventbookingsystem.dto.UserProfileDto;
+import com.epam.campstone.eventbookingsystem.model.User;
+import com.epam.campstone.eventbookingsystem.service.UserService;
+import jakarta.validation.Valid;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+@Controller
+@RequestMapping("/user")
 public class UserController {
+
+    private final UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
+
+    @GetMapping("/profile")
+    public String showProfile(@AuthenticationPrincipal UserDetails currentUser, Model model) {
+        User user = userService.findByEmail(currentUser.getUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (!model.containsAttribute("userProfile")) {
+            UserProfileDto userProfile = new UserProfileDto();
+            userProfile.setFirstName(user.getFirstName());
+            userProfile.setLastName(user.getLastName());
+            userProfile.setEmail(user.getEmail());
+            model.addAttribute("userProfile", userProfile);
+        }
+
+        return "user/profile";
+    }
+
+    @PostMapping("/profile")
+    public String updateProfile(
+            @Valid @ModelAttribute("userProfile") UserProfileDto userProfile,
+            BindingResult bindingResult,
+            @AuthenticationPrincipal UserDetails currentUser,
+            RedirectAttributes redirectAttributes) {
+
+        if (bindingResult.hasErrors()) {
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.userProfile", bindingResult);
+            redirectAttributes.addFlashAttribute("userProfile", userProfile);
+            return "redirect:/user/profile";
+        }
+
+        try {
+            userService.updateUserProfile(currentUser.getUsername(), userProfile);
+            redirectAttributes.addFlashAttribute("successMessage", "Profile updated successfully!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Error updating profile: " + e.getMessage());
+        }
+
+        return "redirect:/user/profile";
+    }
+
+    @GetMapping("/change-password")
+    public String showChangePasswordForm() {
+        return "user/change-password";
+    }
+
+    @PostMapping("/change-password")
+    public String changePassword(
+            @RequestParam("currentPassword") String currentPassword,
+            @RequestParam("newPassword") String newPassword,
+            @RequestParam("confirmPassword") String confirmPassword,
+            @AuthenticationPrincipal UserDetails currentUser,
+            RedirectAttributes redirectAttributes) {
+
+        if (!newPassword.equals(confirmPassword)) {
+            redirectAttributes.addFlashAttribute("errorMessage", "New password and confirm password do not match");
+            return "redirect:/user/change-password";
+        }
+
+        try {
+            userService.changePassword(currentUser.getUsername(), currentPassword, newPassword);
+            redirectAttributes.addFlashAttribute("successMessage", "Password changed successfully!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Error changing password: " + e.getMessage());
+            return "redirect:/user/change-password";
+        }
+
+        return "redirect:/user/profile";
+    }
+
+    @GetMapping("/bookings")
+    public String getUserBookings(@AuthenticationPrincipal UserDetails currentUser, Model model) {
+        model.addAttribute("bookings", userService.getUserBookings(currentUser.getUsername()));
+        return "user/bookings";
+    }
 }

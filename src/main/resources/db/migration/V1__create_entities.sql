@@ -603,3 +603,13 @@ VALUES ('Sydney', (SELECT id FROM country WHERE name = 'Australia')),
        ('Wellington', (SELECT id FROM country WHERE name = 'New Zealand'));
 
 END TRANSACTION;
+
+ALTER TABLE
+    EVENT
+    ADD
+        available_attendees_capacity INT NOT NULL DEFAULT 0;
+
+ALTER TABLE
+    app_user
+    ADD
+        is_active BOOLEAN DEFAULT FALSE;
