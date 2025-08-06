@@ -7,16 +7,15 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
 public class EventDto {
     private Long id;
 
-    @NotBlank(message = "Event name is required")
-    @Size(max = 100, message = "Event name must be less than 100 characters")
-    private String name;
+    @NotBlank(message = "Event title is required")
+    @Size(max = 100, message = "Event title must be less than 100 characters")
+    private String title;
 
     @NotBlank(message = "Description is required")
     @Size(max = 1000, message = "Description must be less than 1000 characters")

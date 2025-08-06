@@ -4,6 +4,7 @@ import com.epam.campstone.eventbookingsystem.exception.TokenRefreshException;
 import com.epam.campstone.eventbookingsystem.model.RefreshToken;
 import com.epam.campstone.eventbookingsystem.repository.RefreshTokenRepository;
 import com.epam.campstone.eventbookingsystem.repository.UserRepository;
+import com.epam.campstone.eventbookingsystem.service.api.RefreshTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;

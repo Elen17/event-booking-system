@@ -1,35 +1,48 @@
 package com.epam.campstone.eventbookingsystem.service.impl;
 
+import com.epam.campstone.eventbookingsystem.dto.UserProfileDto;
 import com.epam.campstone.eventbookingsystem.dto.UserRegistrationDto;
 import com.epam.campstone.eventbookingsystem.exception.DuplicateEmailException;
+import com.epam.campstone.eventbookingsystem.exception.DuplicatePasswordException;
+import com.epam.campstone.eventbookingsystem.exception.WrongPasswordException;
 import com.epam.campstone.eventbookingsystem.model.Country;
 import com.epam.campstone.eventbookingsystem.model.User;
+import com.epam.campstone.eventbookingsystem.model.UserPassword;
 import com.epam.campstone.eventbookingsystem.model.UserRole;
+import com.epam.campstone.eventbookingsystem.repository.UserPasswordRepository;
 import com.epam.campstone.eventbookingsystem.repository.UserRepository;
 import com.epam.campstone.eventbookingsystem.repository.UserRoleRepository;
 import com.epam.campstone.eventbookingsystem.service.api.CountryService;
 import com.epam.campstone.eventbookingsystem.service.api.UserService;
+import com.epam.campstone.eventbookingsystem.util.PasswordUtil;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.userdetails.UserDetailsPasswordService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 @Service
 @Transactional
+@Slf4j
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final UserPasswordRepository userPasswordRepository;
     private final UserRoleRepository userRoleRepository;
     private final CountryService countryService;
     private final PasswordEncoder passwordEncoder;
 
     public UserServiceImpl(UserRepository userRepository,
+                           UserPasswordRepository userPasswordRepository,
                            UserRoleRepository userRoleRepository,
                            CountryService countryService,
                            PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.userPasswordRepository = userPasswordRepository;
         this.userRoleRepository = userRoleRepository;
         this.countryService = countryService;
         this.passwordEncoder = passwordEncoder;
@@ -60,11 +73,10 @@ public class UserServiceImpl implements UserService {
         // Assign default role (ROLE_USER)
         UserRole userRole = userRoleRepository.findByName("ROLE_USER")
                 .orElseGet(() -> {
-                    UserRole newRole = new UserRole();
-                    newRole.setName("ROLE_USER");
+                    UserRole newRole = UserRole.CUSTOMER;
                     return userRoleRepository.save(newRole);
                 });
-        user.setRoles(Collections.singleton(userRole));
+        user.setRole(userRole);
 
         // Generate activation token if email verification is required
         // String activationToken = UUID.randomUUID().toString();
@@ -96,10 +108,34 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean activateUser(String activationToken) {
-        // Implementation for email verification
-        // This would typically find a user by activation token and set them to active
-        // For now, we'll return true as a placeholder
-        return true;
+    public void updateUserProfile(String username, UserProfileDto userProfile) {
+        User user = findByEmail(username).orElseThrow(() -> new RuntimeException("User not found"));
+        user.setFirstName(userProfile.getFirstName());
+        user.setLastName(userProfile.getLastName());
+        user.setCountry(countryService.findById(userProfile.getCountryId()).orElse(null));
+    }
+
+    @Override
+    public void changePassword(String username, String currentPassword, String newPassword) {
+        User user = findByEmail(username).orElseThrow(() -> new RuntimeException("User not found"));
+        List<String> passwords = this.userPasswordRepository.findUserPasswordByUser_Email(user.getEmail())
+                .stream()
+                .map(UserPassword::getPasswordHash)
+                .toList();
+
+        String currentHashedPassword = this.userPasswordRepository.findLatestUserPasswordByEmail(user.getEmail()).getPasswordHash();
+        if (!passwordEncoder.matches(currentPassword, currentHashedPassword)) {
+            log.error("Current password is incorrect: hashes do not match");
+            throw new WrongPasswordException("Current password is incorrect");
+        }
+
+        String newHashedPassword = PasswordUtil.hashPassword(newPassword, user.getPasswordSalt());
+        if (passwords.contains(newHashedPassword)) {
+            log.error("Password has been already used by the user");
+            throw new DuplicatePasswordException("Password has been already used by the user");
+        }
+
+        log.info("Updating password for user: {}", username);
+        user.setPassword(passwordEncoder.encode(newPassword));
     }
 }

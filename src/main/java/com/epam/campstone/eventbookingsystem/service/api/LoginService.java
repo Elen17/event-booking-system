@@ -13,4 +13,6 @@ public interface LoginService {
      * @throws AuthenticationException if authentication fails
      */
     JwtResponseDto authenticateUser(LoginRequestDto loginRequest);
+
+    void logoutUser(String refreshToken);
 }

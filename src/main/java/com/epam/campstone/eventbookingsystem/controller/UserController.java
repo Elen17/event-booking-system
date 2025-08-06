@@ -2,8 +2,9 @@ package com.epam.campstone.eventbookingsystem.controller;
 
 import com.epam.campstone.eventbookingsystem.dto.UserProfileDto;
 import com.epam.campstone.eventbookingsystem.model.User;
-import com.epam.campstone.eventbookingsystem.service.UserService;
+import com.epam.campstone.eventbookingsystem.service.api.UserService;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -14,6 +15,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/user")
+@Slf4j
 public class UserController {
 
     private final UserService userService;
@@ -24,10 +26,13 @@ public class UserController {
 
     @GetMapping("/profile")
     public String showProfile(@AuthenticationPrincipal UserDetails currentUser, Model model) {
+        log.info("Showing profile for user: {}", currentUser.getUsername());
+
         User user = userService.findByEmail(currentUser.getUsername())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         if (!model.containsAttribute("userProfile")) {
+            log.info("Adding user profile to model");
             UserProfileDto userProfile = new UserProfileDto();
             userProfile.setFirstName(user.getFirstName());
             userProfile.setLastName(user.getLastName());
@@ -45,7 +50,10 @@ public class UserController {
             @AuthenticationPrincipal UserDetails currentUser,
             RedirectAttributes redirectAttributes) {
 
+        log.info("Updating profile for user: {}", currentUser.getUsername());
+
         if (bindingResult.hasErrors()) {
+            log.info("Validation errors during profile update: {}", bindingResult.getAllErrors());
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.userProfile", bindingResult);
             redirectAttributes.addFlashAttribute("userProfile", userProfile);
             return "redirect:/user/profile";

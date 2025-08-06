@@ -1,6 +1,7 @@
 package com.epam.campstone.eventbookingsystem.service.api;
 
 import com.epam.campstone.eventbookingsystem.model.RefreshToken;
+import com.epam.campstone.eventbookingsystem.exception.TokenRefreshException;
 
 import java.util.Optional;
 

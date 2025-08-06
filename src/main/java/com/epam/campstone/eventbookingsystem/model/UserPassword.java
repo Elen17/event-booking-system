@@ -6,10 +6,10 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "password")
+@Table(name = "user_password_history")
 @Getter
 @Setter
-public class Password {
+public class UserPassword {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -29,12 +29,6 @@ public class Password {
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
-
-    // Business logic methods
-    public boolean isExpired() {
-        // Passwords might expire after 90 days
-        return createdAt.plusDays(90).isBefore(LocalDateTime.now());
-    }
 
     // Helper method for setting the user (for bidirectional relationship)
     public void setUser(User user) {

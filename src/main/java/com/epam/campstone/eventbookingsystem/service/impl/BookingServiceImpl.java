@@ -4,12 +4,11 @@ import com.epam.campstone.eventbookingsystem.dto.BookingDto;
 import com.epam.campstone.eventbookingsystem.exception.ResourceNotFoundException;
 import com.epam.campstone.eventbookingsystem.model.Booking;
 import com.epam.campstone.eventbookingsystem.model.Event;
-import com.epam.campstone.eventbookingsystem.model.Ticket;
 import com.epam.campstone.eventbookingsystem.model.User;
 import com.epam.campstone.eventbookingsystem.repository.BookingRepository;
 import com.epam.campstone.eventbookingsystem.repository.EventRepository;
-import com.epam.campstone.eventbookingsystem.repository.TicketRepository;
 import com.epam.campstone.eventbookingsystem.repository.UserRepository;
+import com.epam.campstone.eventbookingsystem.service.api.BookingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,17 +27,14 @@ public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
-    private final TicketRepository ticketRepository;
 
     @Autowired
     public BookingServiceImpl(BookingRepository bookingRepository,
                             EventRepository eventRepository,
-                            UserRepository userRepository,
-                            TicketRepository ticketRepository) {
+                            UserRepository userRepository) {
         this.bookingRepository = bookingRepository;
         this.eventRepository = eventRepository;
         this.userRepository = userRepository;
-        this.ticketRepository = ticketRepository;
     }
 
     @Override
@@ -68,7 +64,7 @@ public class BookingServiceImpl implements BookingService {
         
         // Generate tickets
         List<Ticket> tickets = generateTickets(savedBooking, bookingDto.getNumberOfTickets());
-        ticketRepository.saveAll(tickets);
+        bookingRepository.saveAll(tickets);
         
         // Update available spots
         event.setAvailableAttendeesCapacity(event.getAvailableAttendeesCapacity() - bookingDto.getNumberOfTickets());

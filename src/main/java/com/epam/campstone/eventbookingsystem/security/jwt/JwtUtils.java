@@ -6,7 +6,6 @@ import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -22,7 +21,7 @@ public class JwtUtils {
     @Value("${app.jwt.secret}")
     private String jwtSecret;
 
-    @Value("${app.jwt.expiration.ms}")
+    @Value("${app.jwt.expiration.ms:3600000}")
     private int jwtExpirationMs;
 
     /**
@@ -32,6 +31,7 @@ public class JwtUtils {
      * @return JWT token as a string
      */
     public String generateJwtToken(UserDetails userDetails) {
+        log.info("Generating JWT token for user: {}", userDetails.getUsername());
         return generateTokenFromUsername(userDetails.getUsername());
     }
 
@@ -75,21 +75,6 @@ public class JwtUtils {
             log.error("JWT claims string is empty: {}", e.getMessage());
         }
         return false;
-    }
-
-    /**
-     * Extracts the username from a JWT token
-     *
-     * @param token the JWT token
-     * @return the username
-     */
-    public String getUserNameFromJwtToken(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(getSigningKey())
-                .build()
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
     }
 
     /**

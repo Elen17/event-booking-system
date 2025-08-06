@@ -2,6 +2,7 @@ package com.epam.campstone.eventbookingsystem.security;
 
 import com.epam.campstone.eventbookingsystem.model.User;
 import com.epam.campstone.eventbookingsystem.model.UserRole;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -19,15 +20,19 @@ public class UserDetailsImpl implements UserDetails {
     @Getter
     private final Long id;
     private final String email;
+    @JsonIgnore
     private final String password;
     private final Collection<? extends GrantedAuthority> authorities;
+    private final boolean isActive;
 
     public UserDetailsImpl(Long id, String email, String password,
-                           Collection<? extends GrantedAuthority> authorities) {
+                           Collection<? extends GrantedAuthority> authorities,
+                           boolean isActive) {
         this.id = id;
         this.email = email;
         this.password = password;
         this.authorities = authorities;
+        this.isActive = isActive;
     }
 
     public static UserDetailsImpl build(User user) {
@@ -38,7 +43,8 @@ public class UserDetailsImpl implements UserDetails {
                 user.getId(),
                 user.getEmail(),
                 user.getPasswordHash(),
-                Collections.singletonList(authority)
+                Collections.singletonList(authority),
+                user.isActive()
         );
     }
 
@@ -59,17 +65,17 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return true;
+        return isActive;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return isActive;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return true;
+        return isActive;
     }
 
     @Override

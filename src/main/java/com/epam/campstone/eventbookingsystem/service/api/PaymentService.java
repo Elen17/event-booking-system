@@ -13,14 +13,6 @@ public interface PaymentService {
     PaymentResponseDto processPayment(PaymentRequestDto paymentRequest, String userEmail);
 
     /**
-     * Refund a payment for a booking
-     * @param bookingId The ID of the booking to refund
-     * @param userEmail The email of the user requesting the refund
-     * @return PaymentResponseDto containing the refund processing result
-     */
-    PaymentResponseDto processRefund(Long bookingId, String userEmail);
-
-    /**
      * Get payment status for a booking
      * @param bookingId The ID of the booking
      * @param userEmail The email of the user requesting the status

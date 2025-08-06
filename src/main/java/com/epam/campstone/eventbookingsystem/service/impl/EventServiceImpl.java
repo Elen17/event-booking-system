@@ -3,8 +3,9 @@ package com.epam.campstone.eventbookingsystem.service.impl;
 import com.epam.campstone.eventbookingsystem.dto.EventDto;
 import com.epam.campstone.eventbookingsystem.exception.ResourceNotFoundException;
 import com.epam.campstone.eventbookingsystem.model.Event;
+import com.epam.campstone.eventbookingsystem.model.Venue;
 import com.epam.campstone.eventbookingsystem.repository.EventRepository;
-import com.epam.campstone.eventbookingsystem.service.EventService;
+import com.epam.campstone.eventbookingsystem.service.api.EventService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -24,7 +25,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<Event> findAllEvents(Pageable pageable) {
+    public Page<Event> findEvents(Pageable pageable) {
         return eventRepository.findAll(pageable);
     }
 
@@ -35,26 +36,19 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public Event createEvent(EventDto eventDto) {
+    public void createEvent(EventDto eventDto) {
         Event event = new Event();
         mapDtoToEntity(eventDto, event);
-        return eventRepository.save(event);
+        eventRepository.save(event);
     }
 
     @Override
-    public Event updateEvent(Long id, EventDto eventDto) {
+    public void updateEvent(Long id, EventDto eventDto) {
         Event event = eventRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Event not found with id: " + id));
-        
+
         mapDtoToEntity(eventDto, event);
-        return eventRepository.save(event);
-    }
-
-    @Override
-    public void deleteEvent(Long id) {
-        Event event = eventRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Event not found with id: " + id));
-        eventRepository.delete(event);
+        eventRepository.save(event);
     }
 
     @Override
@@ -70,11 +64,11 @@ public class EventServiceImpl implements EventService {
     public void decreaseAvailableSpots(Long eventId, int count) {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new ResourceNotFoundException("Event not found with id: " + eventId));
-        
+
         if (event.getAvailableAttendeesCapacity() < count) {
             throw new IllegalStateException("Not enough available spots");
         }
-        
+
         event.setAvailableAttendeesCapacity(event.getAvailableAttendeesCapacity() - count);
         eventRepository.save(event);
     }
@@ -84,15 +78,15 @@ public class EventServiceImpl implements EventService {
     public void increaseAvailableSpots(Long eventId, int count) {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new ResourceNotFoundException("Event not found with id: " + eventId));
-        
+
         event.setAvailableAttendeesCapacity(event.getAvailableAttendeesCapacity() + count);
         eventRepository.save(event);
     }
 
     private void mapDtoToEntity(EventDto dto, Event entity) {
-        entity.setName(dto.getName());
+        entity.setTitle(dto.getTitle());
         entity.setDescription(dto.getDescription());
-        entity.setLocation(dto.getLocation());
+        entity.setVenue(new Venue(dto.getLocation()));
         entity.setEventDate(dto.getEventDate());
         entity.setAvailableAttendeesCapacity(dto.getAvailableAttendeesCapacity());
         entity.setTicketPrice(dto.getTicketPrice());

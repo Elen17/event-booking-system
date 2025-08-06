@@ -15,14 +15,4 @@ public class UserNotActiveException extends AuthenticationException {
     public UserNotActiveException(String message) {
         super(message);
     }
-
-    /**
-     * Constructs a new UserNotActiveException with the specified detail message and cause.
-     *
-     * @param message the detail message
-     * @param cause   the root cause
-     */
-    public UserNotActiveException(String message, Throwable cause) {
-        super(message, cause);
-    }
 }

@@ -5,7 +5,6 @@ import com.epam.campstone.eventbookingsystem.model.Event;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.List;
 import java.util.Optional;
 
 public interface EventService {
@@ -15,7 +14,7 @@ public interface EventService {
      * @param pageable pagination information
      * @return page of events
      */
-    Page<Event> findAllEvents(Pageable pageable);
+    Page<Event> findEvents(Pageable pageable);
 
     /**
      * Find an event by ID
@@ -29,25 +28,16 @@ public interface EventService {
      * Create a new event
      *
      * @param eventDto the event data
-     * @return the created event
      */
-    Event createEvent(EventDto eventDto);
+    void createEvent(EventDto eventDto);
 
     /**
      * Update an existing event
      *
      * @param id       the event ID
      * @param eventDto the updated event data
-     * @return the updated event
      */
-    Event updateEvent(Long id, EventDto eventDto);
-
-    /**
-     * Delete an event by ID
-     *
-     * @param id the event ID
-     */
-    void deleteEvent(Long id);
+    void updateEvent(Long id, EventDto eventDto);
 
     /**
      * Check if an event has available spots

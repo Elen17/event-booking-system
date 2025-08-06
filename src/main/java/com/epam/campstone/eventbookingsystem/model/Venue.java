@@ -31,6 +31,14 @@ public class Venue {
     @OneToMany(mappedBy = "venue", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Seat> seats = new HashSet<>();
 
+    public static Venue create(String name, String address, City city) {
+        Venue venue = new Venue();
+        venue.setName(name);
+        venue.setAddress(address);
+        venue.setCity(city);
+        return venue;
+    }
+
     // Helper methods for bidirectional relationships
     public void addEvent(Event event) {
         events.add(event);

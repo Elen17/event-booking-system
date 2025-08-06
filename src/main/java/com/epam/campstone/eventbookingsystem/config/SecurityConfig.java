@@ -1,6 +1,7 @@
 package com.epam.campstone.eventbookingsystem.config;
 
 import com.epam.campstone.eventbookingsystem.security.UserDetailsServiceImpl;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -14,11 +15,20 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
+
+import static com.epam.campstone.eventbookingsystem.util.AppConstants.ROLE_ADMIN;
+import static com.epam.campstone.eventbookingsystem.util.AppConstants.ROLE_USER;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+    @Value("${token.validity.seconds}")
+    private int tokenValiditySeconds;
+
+    @Value("${homepage.url}")
+    private String homepageUrl;
+
 
     private final UserDetailsServiceImpl userDetailsService;
 
@@ -42,21 +52,21 @@ public class SecurityConfig {
                 ).permitAll()
                 .requestMatchers(
                     "/user/**"
-                ).hasRole("USER")
+                ).hasRole(ROLE_USER)
                 .requestMatchers(
                     "/admin/**"
-                ).hasRole("ADMIN")
+                ).hasRole(ROLE_ADMIN)
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
                 .loginPage("/auth/login")
                 .loginProcessingUrl("/auth/login")
-                .defaultSuccessUrl("/dashboard", true)
+                .defaultSuccessUrl(homepageUrl, true)
                 .failureUrl("/auth/login?error=true")
                 .permitAll()
             )
             .logout(logout -> logout
-                .logoutRequestMatcher(new AntPathRequestMatcher("/auth/logout"))
+                .logoutRequestMatcher(PathPatternRequestMatcher.withDefaults().matcher("/auth/logout"))
                 .logoutSuccessUrl("/auth/login?logout")
                 .invalidateHttpSession(true)
                 .deleteCookies("JSESSIONID")
@@ -64,7 +74,7 @@ public class SecurityConfig {
             )
             .rememberMe(remember -> remember
                 .key("uniqueAndSecret")
-                .tokenValiditySeconds(86400) // 24 hours
+                .tokenValiditySeconds(tokenValiditySeconds)
                 .userDetailsService(userDetailsService)
             )
             .exceptionHandling(exception -> exception
@@ -77,8 +87,7 @@ public class SecurityConfig {
 
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService);
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }
@@ -95,7 +104,7 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationSuccessHandler successHandler() {
-        return (request, response, authentication) -> response.sendRedirect("/dashboard");
+        return (request, response, authentication) -> response.sendRedirect(homepageUrl);
     }
 
     @Bean

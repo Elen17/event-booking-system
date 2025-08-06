@@ -52,7 +52,7 @@ public class User {
     private Set<Booking> bookings = new HashSet<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Password> passwords = new HashSet<>();
+    private Set<UserPassword> passwords = new HashSet<>();
 
     /**
      * Sets the user's password by hashing it with a new salt
@@ -63,7 +63,7 @@ public class User {
         this.passwordHash = PasswordUtil.hashPassword(plainPassword, this.passwordSalt);
         
         // Also update the password history
-        Password passwordHistory = new Password();
+        UserPassword passwordHistory = new UserPassword();
         passwordHistory.setPasswordHash(this.passwordHash);
         passwordHistory.setSalt(this.passwordSalt);
         passwordHistory.setCreatedAt(LocalDateTime.now());
@@ -90,12 +90,12 @@ public class User {
         booking.setUser(null);
     }
 
-    public void addPassword(Password password) {
+    public void addPassword(UserPassword password) {
         passwords.add(password);
         password.setUser(this);
     }
 
-    public void removePassword(Password password) {
+    public void removePassword(UserPassword password) {
         passwords.remove(password);
         password.setUser(null);
     }

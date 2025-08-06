@@ -22,7 +22,7 @@ public enum UserRole {
 
     private String description;
 
-    UserRole(String name, String description) {
+    UserRole (String name, String description) {
         this.name = name;
         this.description = description;
     }

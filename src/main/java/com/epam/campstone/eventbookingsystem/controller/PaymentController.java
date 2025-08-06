@@ -2,9 +2,9 @@ package com.epam.campstone.eventbookingsystem.controller;
 
 import com.epam.campstone.eventbookingsystem.dto.PaymentRequestDto;
 import com.epam.campstone.eventbookingsystem.dto.PaymentResponseDto;
-import com.epam.campstone.eventbookingsystem.service.PaymentService;
+import com.epam.campstone.eventbookingsystem.service.api.PaymentService;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -15,28 +15,45 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/payments")
-@RequiredArgsConstructor
+@Slf4j
 public class PaymentController {
 
     private final PaymentService paymentService;
 
+    public PaymentController(PaymentService paymentService) {
+        this.paymentService = paymentService;
+    }
+
     /**
-     * Show payment form for a booking
+     * Shows the payment form.
+     * <p>
+     * This method shows the payment form and pre-populates it with the booking details.
+     * If the booking is not found, it throws a runtime exception.
+     * <p>
+     * The method also checks if the booking has already been paid for.
+     * If it has been paid, it redirects to the payment status page.
+     *
+     * @param bookingId The ID of the booking to pay for.
+     * @param currentUser The user performing the action.
+     * @param model The model to add attributes to.
+     * @return The view name for the payment form.
      */
     @GetMapping("/new/{bookingId}")
     public String showPaymentForm(
             @PathVariable Long bookingId,
             @AuthenticationPrincipal UserDetails currentUser,
             Model model) {
+
+        log.info("Showing payment form for booking: {} for user: {}", bookingId, currentUser.getUsername());
         
         if (!model.containsAttribute("paymentRequest")) {
             PaymentRequestDto paymentRequest = new PaymentRequestDto();
             paymentRequest.setBookingId(bookingId);
             model.addAttribute("paymentRequest", paymentRequest);
         }
-        
-        // Add booking details to the model for display
+
         PaymentResponseDto paymentStatus = paymentService.getPaymentStatus(bookingId, currentUser.getUsername());
+        log.info("Payment status for booking {}: {}",bookingId, paymentStatus);
         model.addAttribute("bookingId", bookingId);
         model.addAttribute("paymentStatus", paymentStatus);
         
@@ -44,7 +61,19 @@ public class PaymentController {
     }
 
     /**
-     * Process payment for a booking
+     * Process a payment.
+     *
+     * <p>This method processes a payment for the given booking ID.
+     * It validates the input data, calls the payment service to process the payment,
+     * and redirects to the booking page with a success or error message.
+     * If the payment fails, it redirects to the payment form with an error message.
+     * If an exception occurs, it redirects to the payment form with an error message.
+     *
+     * @param paymentRequest The payment request containing the booking ID and card details.
+     * @param bindingResult The binding result to hold validation errors.
+     * @param currentUser The user performing the action.
+     * @param redirectAttributes Attributes for flash messages during redirection.
+     * @return The view name or redirect URL.
      */
     @PostMapping
     public String processPayment(
@@ -78,33 +107,6 @@ public class PaymentController {
                 "Error processing payment: " + e.getMessage());
             return "redirect:/payments/new/" + paymentRequest.getBookingId();
         }
-    }
-
-    /**
-     * Process refund for a booking
-     */
-    @PostMapping("/refund/{bookingId}")
-    public String processRefund(
-            @PathVariable Long bookingId,
-            @AuthenticationPrincipal UserDetails currentUser,
-            RedirectAttributes redirectAttributes) {
-        
-        try {
-            PaymentResponseDto response = paymentService.processRefund(bookingId, currentUser.getUsername());
-            
-            if (response.isSuccess()) {
-                redirectAttributes.addFlashAttribute("successMessage",
-                    "Refund processed successfully! Transaction ID: " + response.getTransactionId());
-            } else {
-                redirectAttributes.addFlashAttribute("errorMessage",
-                    "Refund failed: " + response.getMessage());
-            }
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage",
-                "Error processing refund: " + e.getMessage());
-        }
-        
-        return "redirect:/bookings/" + bookingId;
     }
 
     /**

@@ -1,9 +1,6 @@
 package com.epam.campstone.eventbookingsystem.repository;
 
-import com.epam.campstone.eventbookingsystem.model.Event;
-import com.epam.campstone.eventbookingsystem.model.EventSeat;
-import com.epam.campstone.eventbookingsystem.model.Seat;
-import com.epam.campstone.eventbookingsystem.model.SeatStatus;
+import com.epam.campstone.eventbookingsystem.model.*;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
