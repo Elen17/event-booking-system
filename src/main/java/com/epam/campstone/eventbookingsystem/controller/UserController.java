@@ -2,6 +2,7 @@ package com.epam.campstone.eventbookingsystem.controller;
 
 import com.epam.campstone.eventbookingsystem.dto.UserProfileDto;
 import com.epam.campstone.eventbookingsystem.model.User;
+import com.epam.campstone.eventbookingsystem.service.api.BookingService;
 import com.epam.campstone.eventbookingsystem.service.api.UserService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -19,9 +20,11 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class UserController {
 
     private final UserService userService;
+    private final BookingService bookingService;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, BookingService bookingService) {
         this.userService = userService;
+        this.bookingService = bookingService;
     }
 
     @GetMapping("/profile")
@@ -100,7 +103,7 @@ public class UserController {
 
     @GetMapping("/bookings")
     public String getUserBookings(@AuthenticationPrincipal UserDetails currentUser, Model model) {
-        model.addAttribute("bookings", userService.getUserBookings(currentUser.getUsername()));
+        model.addAttribute("bookings", bookingService.findUserBookings(currentUser.getUsername()));
         return "user/bookings";
     }
 }

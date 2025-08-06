@@ -261,6 +261,7 @@ VALUES ('Armenia'),
        ('Germany'),
        ('Italy'),
        ('Poland'),
+       ('Spain'),
        ('Portugal'),
        ('United Kingdom'),
        ('United States');

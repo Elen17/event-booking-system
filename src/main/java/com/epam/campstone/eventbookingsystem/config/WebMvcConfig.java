@@ -18,15 +18,15 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
         // Public pages
-        registry.addViewController("/").setViewName("home");
-        registry.addViewController("/home").setViewName("home");
+        registry.addViewController("/").setViewName("auth/login");
+        registry.addViewController("/home").setViewName("home/dashboard");
         
         // Authentication pages
         registry.addViewController("/auth/login").setViewName("auth/login");
         registry.addViewController("/auth/register").setViewName("auth/register");
         
         // User pages
-        registry.addViewController("/dashboard").setViewName("user/dashboard");
+        registry.addViewController("/dashboard").setViewName("home/dashboard");
         registry.addViewController("/profile").setViewName("user/profile");
         
         // Error pages

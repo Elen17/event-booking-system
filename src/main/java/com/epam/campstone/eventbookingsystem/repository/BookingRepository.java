@@ -59,4 +59,10 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     @Query("SELECT b FROM Booking b WHERE b.createdAt BETWEEN :startDate AND :endDate")
     List<Booking> findBookingsBetweenDates(@Param("startDate") LocalDateTime startDate,
                                           @Param("endDate") LocalDateTime endDate);
+
+    @Query("SELECT b FROM Booking b WHERE b.id = :id AND b.user.email = :userEmail")
+    Optional<Booking> findByIdAndUserEmail(Long id, String userEmail);
+
+    @Query("SELECT b FROM Booking b WHERE b.user.email = :userEmail ORDER BY b.createdAt DESC")
+    List<Booking> findByUserEmailOrderByBookingDateDesc(String userEmail);
 }

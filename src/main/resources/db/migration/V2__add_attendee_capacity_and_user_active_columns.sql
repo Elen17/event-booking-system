@@ -1,12 +1,34 @@
 ALTER TABLE
     EVENT
-    ADD
+    ADD IF NOT EXISTS
         available_attendees_capacity INT NOT NULL DEFAULT 0;
 
 ALTER TABLE
     app_user
-    ADD
+    ADD IF NOT EXISTS
         is_active BOOLEAN DEFAULT FALSE;
+
+CREATE TABLE IF NOT EXISTS ticket (
+                                      id SERIAL PRIMARY KEY,
+                                      ticket_number VARCHAR(20) UNIQUE NOT NULL,
+    ticket_status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
+    issued_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    used_at TIMESTAMP,
+    qr_code TEXT,
+    barcode TEXT,
+
+    booking_id INT NOT NULL,
+    seat_id INT NOT NULL,
+    event_id INT NOT NULL,
+
+    CONSTRAINT fk_ticket_booking FOREIGN KEY (booking_id) REFERENCES booking(id) ON DELETE CASCADE,
+    CONSTRAINT fk_ticket_seat FOREIGN KEY (seat_id) REFERENCES seat(id),
+    CONSTRAINT fk_ticket_event FOREIGN KEY (event_id) REFERENCES event(id),
+
+    CONSTRAINT uq_booking_seat UNIQUE (booking_id, seat_id),
+    CONSTRAINT chk_ticket_status CHECK (ticket_status IN ('ACTIVE', 'USED', 'CANCELLED'))
+    );
+
 
 CREATE TABLE IF NOT EXISTS booking_group (
                                              id SERIAL PRIMARY KEY,

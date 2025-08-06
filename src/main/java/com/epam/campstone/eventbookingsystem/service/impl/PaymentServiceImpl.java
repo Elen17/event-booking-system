@@ -2,7 +2,6 @@ package com.epam.campstone.eventbookingsystem.service.impl;
 
 import com.epam.campstone.eventbookingsystem.dto.PaymentRequestDto;
 import com.epam.campstone.eventbookingsystem.dto.PaymentResponseDto;
-import com.epam.campstone.eventbookingsystem.model.Booking;
 import com.epam.campstone.eventbookingsystem.repository.BookingRepository;
 import com.epam.campstone.eventbookingsystem.service.api.PaymentService;
 import org.springframework.stereotype.Service;
@@ -78,60 +77,6 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public PaymentResponseDto processRefund(Long bookingId, String userEmail) {
-        // Simulate refund processing with 95% success rate
-        boolean isSuccess = random.nextDouble() < 0.95;
-        String transactionId = "RFND" + UUID.randomUUID().toString().substring(0, 12).toUpperCase();
-        
-        return bookingRepository.findById(bookingId)
-                .map(booking -> {
-                    if (!booking.getUser().getEmail().equals(userEmail)) {
-                        return new PaymentResponseDto(
-                                false,
-                                "",
-                                "Unauthorized access to booking",
-                                LocalDateTime.now(),
-                                bookingId,
-                                booking.getTotalPrice(),
-                                "DENIED"
-                        );
-                    }
-
-                    if (isSuccess) {
-                        // In a real implementation, we would update the booking status here
-                        return new PaymentResponseDto(
-                                true,
-                                transactionId,
-                                "Refund processed successfully",
-                                LocalDateTime.now(),
-                                bookingId,
-                                booking.getTotalPrice(),
-                                "REFUNDED"
-                        );
-                    } else {
-                        return new PaymentResponseDto(
-                                false,
-                                "",
-                                "Refund processing failed",
-                                LocalDateTime.now(),
-                                bookingId,
-                                booking.getTotalPrice(),
-                                "FAILED"
-                        );
-                    }
-                })
-                .orElse(new PaymentResponseDto(
-                        false,
-                        "",
-                        "Booking not found",
-                        LocalDateTime.now(),
-                        bookingId,
-                        null,
-                        "ERROR"
-                ));
-    }
-
-    @Override
     public PaymentResponseDto getPaymentStatus(Long bookingId, String userEmail) {
         return bookingRepository.findById(bookingId)
                 .map(booking -> {
@@ -158,7 +103,7 @@ public class PaymentServiceImpl implements PaymentService {
                             "Payment status: " + status,
                             LocalDateTime.now(),
                             bookingId,
-                            booking.getTotalPrice(),
+                            booking.getPrice(),
                             status
                     );
                 })

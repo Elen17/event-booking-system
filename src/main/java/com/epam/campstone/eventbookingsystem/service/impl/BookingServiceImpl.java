@@ -2,11 +2,10 @@ package com.epam.campstone.eventbookingsystem.service.impl;
 
 import com.epam.campstone.eventbookingsystem.dto.BookingDto;
 import com.epam.campstone.eventbookingsystem.exception.ResourceNotFoundException;
-import com.epam.campstone.eventbookingsystem.model.Booking;
-import com.epam.campstone.eventbookingsystem.model.Event;
-import com.epam.campstone.eventbookingsystem.model.User;
+import com.epam.campstone.eventbookingsystem.model.*;
 import com.epam.campstone.eventbookingsystem.repository.BookingRepository;
 import com.epam.campstone.eventbookingsystem.repository.EventRepository;
+import com.epam.campstone.eventbookingsystem.repository.TicketRepository;
 import com.epam.campstone.eventbookingsystem.repository.UserRepository;
 import com.epam.campstone.eventbookingsystem.service.api.BookingService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,14 +26,17 @@ public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
+    private final TicketRepository ticketRepository;
 
     @Autowired
     public BookingServiceImpl(BookingRepository bookingRepository,
                             EventRepository eventRepository,
-                            UserRepository userRepository) {
+                            UserRepository userRepository,
+                            TicketRepository ticketRepository) {
         this.bookingRepository = bookingRepository;
         this.eventRepository = eventRepository;
         this.userRepository = userRepository;
+        this.ticketRepository = ticketRepository;
     }
 
     @Override
@@ -52,19 +54,21 @@ public class BookingServiceImpl implements BookingService {
         
         // Create booking
         Booking booking = new Booking();
-        booking.setUser(user);
-        booking.setEvent(event);
-        booking.setBookingDate(LocalDateTime.now());
-        booking.setNumberOfTickets(bookingDto.getNumberOfTickets());
-        booking.setTotalPrice(calculateTotalPrice(event.getTicketPrice(), bookingDto.getNumberOfTickets()));
-        booking.setBookingNumber(generateBookingNumber());
-        booking.setStatus(Booking.BookingStatus.CONFIRMED);
-        
+
+        // todo implement
+//        booking.setUser(user);
+//        booking.setEvent(event);
+//        booking.setBookingDate(LocalDateTime.now());
+//        booking.setNumberOfTickets(bookingDto.getNumberOfTickets());
+//        booking.setPrice(calculateTotalPrice(event.getTicketPrice(), bookingDto.getNumberOfTickets()));
+//        booking.setBookingNumber(generateBookingNumber());
+//        booking.setStatus(Booking.BookingStatus.CONFIRMED);
+//
         Booking savedBooking = bookingRepository.save(booking);
-        
-        // Generate tickets
-        List<Ticket> tickets = generateTickets(savedBooking, bookingDto.getNumberOfTickets());
-        bookingRepository.saveAll(tickets);
+//
+//        // Generate tickets
+//        List<Ticket> tickets = generateTickets(savedBooking, bookingDto.getNumberOfTickets());
+//        bookingRepository.saveAll(tickets);
         
         // Update available spots
         event.setAvailableAttendeesCapacity(event.getAvailableAttendeesCapacity() - bookingDto.getNumberOfTickets());
@@ -84,18 +88,18 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = bookingRepository.findByIdAndUserEmail(bookingId, userEmail)
                 .orElseThrow(() -> new ResourceNotFoundException("Booking not found with id: " + bookingId));
         
-        if (booking.getStatus() == Booking.BookingStatus.CANCELLED) {
+        if (booking.getStatus() == BookingStatus.CANCELLED) {
             return false; // Already cancelled
         }
         
         // Update booking status
-        booking.setStatus(Booking.BookingStatus.CANCELLED);
+        booking.setStatus(BookingStatus.CANCELLED);
         bookingRepository.save(booking);
         
         // Return tickets to available capacity
         Event event = booking.getEvent();
         event.setAvailableAttendeesCapacity(
-                event.getAvailableAttendeesCapacity() + booking.getNumberOfTickets()
+                event.getAvailableAttendeesCapacity() + booking.getTickets().size()
         );
         eventRepository.save(event);
         
@@ -119,8 +123,8 @@ public class BookingServiceImpl implements BookingService {
                 .mapToObj(i -> {
                     Ticket ticket = new Ticket();
                     ticket.setBooking(booking);
-                    ticket.setTicketNumber(generateTicketNumber(booking.getBookingNumber(), i + 1));
-                    ticket.setStatus(Ticket.TicketStatus.VALID);
+                    ticket.setTicketNumber(generateTicketNumber(booking.getBookingReference(), i + 1));
+                    ticket.setTicketStatus(Ticket.TicketStatus.ACTIVE);
                     return ticket;
                 })
                 .collect(Collectors.toList());

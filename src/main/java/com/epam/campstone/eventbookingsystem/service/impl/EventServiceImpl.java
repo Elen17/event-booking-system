@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -84,11 +85,10 @@ public class EventServiceImpl implements EventService {
     }
 
     private void mapDtoToEntity(EventDto dto, Event entity) {
+        // todo implement
         entity.setTitle(dto.getTitle());
         entity.setDescription(dto.getDescription());
-        entity.setVenue(new Venue(dto.getLocation()));
-        entity.setEventDate(dto.getEventDate());
+        entity.setEventDate(dto.getEventDate().toLocalDate());
         entity.setAvailableAttendeesCapacity(dto.getAvailableAttendeesCapacity());
-        entity.setTicketPrice(dto.getTicketPrice());
     }
 }

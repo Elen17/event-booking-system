@@ -118,7 +118,7 @@ public class AuthController {
                     "org.springframework.validation.BindingResult.userRegistrationDto",
                     bindingResult);
             redirectAttributes.addFlashAttribute("userRegistrationDto", userRegistrationDto);
-            return "redirect:/auth/register";
+            return "auth/register";
         }
 
         try {

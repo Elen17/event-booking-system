@@ -27,14 +27,6 @@ public interface CountryService {
     Optional<Country> findByName(String name);
 
     /**
-     * Find a country by its ISO code (case-insensitive).
-     *
-     * @param isoCode the ISO country code (2 or 3 letters)
-     * @return an Optional containing the country if found
-     */
-    Optional<Country> findByIsoCode(String isoCode);
-
-    /**
      * Retrieve all countries, ordered by name.
      *
      * @return a list of all countries

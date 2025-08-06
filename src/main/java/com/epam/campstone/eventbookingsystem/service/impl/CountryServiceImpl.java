@@ -26,7 +26,7 @@ public class CountryServiceImpl implements CountryService {
 
     @Override
     public Optional<Country> findByName(String name) {
-        return countryRepository.findByNameIgnoreCase(name);
+        return countryRepository.findByName(name);
     }
 
     @Override
@@ -57,29 +57,4 @@ public class CountryServiceImpl implements CountryService {
         return id != null && countryRepository.existsById(id);
     }
 
-    @Override
-    @Transactional
-    public void initializeCountries() {
-        // This method can be used to populate the database with initial country data
-        // It's typically called during application startup or as part of a data migration
-        if (countryRepository.count() == 0) {
-            // Add some sample countries
-            saveCountry("United States", "US", "USA");
-            saveCountry("United Kingdom", "GB", "GBR");
-            saveCountry("Canada", "CA", "CAN");
-            saveCountry("Australia", "AU", "AUS");
-            saveCountry("Germany", "DE", "DEU");
-            saveCountry("France", "FR", "FRA");
-            saveCountry("Japan", "JP", "JPN");
-            saveCountry("China", "CN", "CHN");
-            saveCountry("India", "IN", "IND");
-            saveCountry("Brazil", "BR", "BRA");
-        }
-    }
-
-    private void saveCountry(String name, String iso2Code, String iso3Code) {
-        Country country = new Country();
-        country.setName(name);
-        countryRepository.save(country);
-    }
 }

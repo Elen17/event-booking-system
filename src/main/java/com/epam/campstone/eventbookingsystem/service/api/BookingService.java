@@ -2,6 +2,7 @@ package com.epam.campstone.eventbookingsystem.service.api;
 
 import com.epam.campstone.eventbookingsystem.dto.BookingDto;
 import com.epam.campstone.eventbookingsystem.model.Booking;
+import com.epam.campstone.eventbookingsystem.model.Ticket;
 
 import java.util.List;
 import java.util.Optional;

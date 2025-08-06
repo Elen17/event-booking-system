@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "booking")
@@ -33,6 +34,16 @@ public class Booking {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "booking_status_id", nullable = false)
     private BookingStatus status;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "booking_group_id")
+    private BookingGroup bookingGroup;
+
+    @OneToMany(mappedBy = "currentBooking", fetch = FetchType.LAZY)
+    private List<Seat> currentSeats;
+
+    @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Ticket> tickets;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
