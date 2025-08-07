@@ -21,9 +21,9 @@ public class EventDto {
     @Size(max = 1000, message = "Description must be less than 1000 characters")
     private String description;
 
-    @NotBlank(message = "Location is required")
-    @Size(max = 200, message = "Location must be less than 200 characters")
-    private String location;
+    @NotBlank(message = "Venue is required")
+    @Size(max = 200, message = "Venue must be less than 200 characters")
+    private VenueDto venue;
 
     @NotNull(message = "Event date is required")
     @Future(message = "Event date must be in the future")
@@ -31,5 +31,11 @@ public class EventDto {
 
     @NotNull(message = "Capacity is required")
     @Min(value = 1, message = "Capacity must be at least 1")
+    private Integer attendeesCapacity;
+
+    @NotNull(message = "Available capacity is required")
+    @Min(value = 1, message = "Available capacity must be at least 1")
     private Integer availableAttendeesCapacity;
+
+
 }

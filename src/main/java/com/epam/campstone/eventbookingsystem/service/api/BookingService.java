@@ -2,7 +2,7 @@ package com.epam.campstone.eventbookingsystem.service.api;
 
 import com.epam.campstone.eventbookingsystem.dto.BookingDto;
 import com.epam.campstone.eventbookingsystem.model.Booking;
-import com.epam.campstone.eventbookingsystem.model.Ticket;
+import com.epam.campstone.eventbookingsystem.model.Seat;
 
 import java.util.List;
 import java.util.Optional;
@@ -31,9 +31,8 @@ public interface BookingService {
      *
      * @param bookingId the booking ID
      * @param userEmail the user's email (for authorization)
-     * @return true if the booking was cancelled, false otherwise
      */
-    boolean cancelBooking(Long bookingId, String userEmail);
+    void cancelBooking(Long bookingId, String userEmail);
 
     /**
      * Find all bookings for a user
@@ -49,5 +48,5 @@ public interface BookingService {
      * @param bookingId the booking ID
      * @return list of tickets for the booking
      */
-    List<Ticket> findTicketsByBookingId(Long bookingId);
+    List<Seat> findSeatsByBookingId(Long bookingId);
 }

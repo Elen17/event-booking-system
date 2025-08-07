@@ -18,7 +18,7 @@ public class HomeController {
             return "redirect:/dashboard";
         }
         log.info("Non-authenticated user accessing home page");
-        return "home";
+        return "auth/login";
     }
 
     @GetMapping("/home")

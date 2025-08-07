@@ -4,15 +4,19 @@ import com.epam.campstone.eventbookingsystem.dto.UserRegistrationDto;
 import com.epam.campstone.eventbookingsystem.exception.DuplicateEmailException;
 import com.epam.campstone.eventbookingsystem.model.Country;
 import com.epam.campstone.eventbookingsystem.model.User;
+import com.epam.campstone.eventbookingsystem.model.UserPasswordHistory;
 import com.epam.campstone.eventbookingsystem.model.UserRole;
 import com.epam.campstone.eventbookingsystem.repository.CountryRepository;
+import com.epam.campstone.eventbookingsystem.repository.UserPasswordRepository;
 import com.epam.campstone.eventbookingsystem.repository.UserRepository;
 import com.epam.campstone.eventbookingsystem.repository.UserRoleRepository;
 import com.epam.campstone.eventbookingsystem.service.api.RegistrationService;
+import com.epam.campstone.eventbookingsystem.util.PasswordUtil;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.UUID;
 
 @Service
@@ -22,16 +26,19 @@ public class RegistrationServiceImpl implements RegistrationService {
     private final UserRoleRepository userRoleRepository;
     private final CountryRepository countryRepository;
     private final String defaultRoleName;
+    private final UserPasswordRepository userPasswordHistoryRepository;
 
     public RegistrationServiceImpl(
             UserRepository userRepository,
             UserRoleRepository userRoleRepository,
             CountryRepository countryRepository,
-            @Value("${app.security.default-role:ROLE_USER}") String defaultRoleName) {
+            @Value("${app.security.default-role:ROLE_USER}") String defaultRoleName,
+            UserPasswordRepository userPasswordHistoryRepository) {
         this.userRepository = userRepository;
         this.userRoleRepository = userRoleRepository;
         this.countryRepository = countryRepository;
         this.defaultRoleName = defaultRoleName;
+        this.userPasswordHistoryRepository = userPasswordHistoryRepository;
     }
 
     @Override
@@ -59,28 +66,19 @@ public class RegistrationServiceImpl implements RegistrationService {
         user.setCountry(country);
 
         // Set the password (this will hash it with a new salt)
-        user.setPassword(registrationDto.getPassword());
+        UserPasswordHistory passwordHistory = new UserPasswordHistory();
+        String salt = PasswordUtil.generateSalt();
+        passwordHistory.setPasswordHash(PasswordUtil.hashPassword(registrationDto.getPassword(), salt));
+        passwordHistory.setSalt(salt);
+        passwordHistory.setCreatedAt(Instant.now());
+        passwordHistory.setUser(user);
 
-        // Generate email verification token
-        String verificationToken = generateVerificationToken();
-        // In a real application, you would save this token and send a verification email
-        // For now, we'll just mark the user as verified
+        userRepository.save(user);
+
+        userPasswordHistoryRepository.save(passwordHistory);
+
+        user.getUserPasswordHistories().add(passwordHistory);
 
         return userRepository.save(user);
-    }
-
-    @Override
-    public boolean verifyEmail(String token) {
-        // In a real application, you would:
-        // 1. Look up the verification token
-        // 2. Find the associated user
-        // 3. Mark the user as verified
-        // 4. Delete the verification token
-        // For now, we'll just return true to indicate success
-        return true;
-    }
-
-    private String generateVerificationToken() {
-        return UUID.randomUUID().toString();
     }
 }

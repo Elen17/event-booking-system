@@ -10,11 +10,9 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface CountryRepository extends JpaRepository<Country, Long> {
+public interface CountryRepository extends JpaRepository<Country, Integer> {
     Optional<Country> findByName(String name);
 
     @Query("SELECT c FROM Country c ORDER BY c.name ASC")
     List<Country> findAllByOrderByNameAsc();
-
-    boolean existsByName(String name);
 }

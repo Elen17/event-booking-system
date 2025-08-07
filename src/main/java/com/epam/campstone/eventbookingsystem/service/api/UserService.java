@@ -10,15 +10,6 @@ import java.util.Optional;
 public interface UserService {
 
     /**
-     * Register a new user with the provided registration details
-     *
-     * @param registrationDto the user registration data
-     * @return the registered user
-     * @throws IllegalArgumentException if the email is already in use
-     */
-    User registerNewUser(UserRegistrationDto registrationDto);
-
-    /**
      * Check if a user with the given email exists
      *
      * @param email the email to check

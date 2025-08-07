@@ -39,7 +39,7 @@ public class BookingController {
                 .orElseThrow(() -> new RuntimeException("Event not found"));
 
         // Set default values for the booking form
-        if (bookingDto.getNumberOfTickets() == null) {
+        if (bookingDto.getSeats() == null) {
             log.info("Current event has no available tickets");
             model.addAttribute("errorMessage", "Current event has no available tickets");
             return "redirect:/events/" + eventId;
@@ -121,7 +121,6 @@ public class BookingController {
                 .orElseThrow(() -> new RuntimeException("Booking not found or access denied"));
 
         model.addAttribute("booking", booking);
-        model.addAttribute("tickets", bookingService.findTicketsByBookingId(id));
 
         return "bookings/tickets";
     }

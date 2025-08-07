@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS city
 CREATE TABLE IF NOT EXISTS venue
 (
     id      SERIAL PRIMARY KEY,
-    name    VARCHAR(255) NOT NULL,
+    name    VARCHAR(255) NOT NULL, -- Added missing venue name
     city_id INT          NOT NULL,
     address VARCHAR(255) NOT NULL,
     FOREIGN KEY (city_id) REFERENCES city (id)
@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS user_role
     name VARCHAR(255) NOT NULL UNIQUE
 );
 
+-- Clear and populate user_role
 INSERT INTO user_role (name)
 VALUES ('ADMIN'),
        ('USER');
@@ -52,10 +53,14 @@ CREATE TABLE IF NOT EXISTS event_type
     name VARCHAR(255) NOT NULL UNIQUE
 );
 
+-- Clear and populate event_type
 INSERT INTO event_type (name)
 VALUES ('Concert'),
+       ('Sport'),
+       ('Festival'),
        ('Cinema'),
        ('Theater'),
+       ('Sports'),
        ('Opera and Ballet');
 
 CREATE TABLE IF NOT EXISTS seat_status
@@ -64,6 +69,7 @@ CREATE TABLE IF NOT EXISTS seat_status
     name VARCHAR(255) NOT NULL UNIQUE
 );
 
+-- Clear and populate seat_status
 INSERT INTO seat_status (name)
 VALUES ('AVAILABLE'),
        ('RESERVED'),
@@ -71,14 +77,13 @@ VALUES ('AVAILABLE'),
 
 CREATE TABLE IF NOT EXISTS app_user
 (
-    id            SERIAL PRIMARY KEY,
-    first_name    VARCHAR(255) NOT NULL,
-    last_name     VARCHAR(255) NOT NULL,
-    email         VARCHAR(255) NOT NULL UNIQUE,
-    password_hash VARCHAR(255) NOT NULL,
-    role_id       INT          NOT NULL,
-    created_at    TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    country_id    INT          NOT NULL,
+    id         SERIAL PRIMARY KEY,
+    first_name VARCHAR(255) NOT NULL,
+    last_name  VARCHAR(255) NOT NULL,
+    email      VARCHAR(255) NOT NULL UNIQUE,
+    role_id    INT          NOT NULL,
+    created_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    country_id INT          NOT NULL,
     FOREIGN KEY (country_id) REFERENCES country (id),
     FOREIGN KEY (role_id) REFERENCES user_role (id)
 );
@@ -101,8 +106,6 @@ CREATE TABLE IF NOT EXISTS booking_status
     description TEXT,
     is_active   BOOLEAN DEFAULT TRUE
 );
-
-TRUNCATE TABLE booking_status;
 
 INSERT INTO booking_status (name, description)
 VALUES ('TEMPORARY_HOLD', 'Seat temporarily reserved (2 days max)'),
@@ -249,8 +252,6 @@ CREATE TRIGGER trigger_set_booking_expiration
 EXECUTE FUNCTION set_booking_expiration();
 
 -- Clear existing data before inserting
-TRUNCATE TABLE country CASCADE;
-
 INSERT INTO country (name)
 VALUES ('Armenia'),
        ('Australia'),
@@ -265,6 +266,7 @@ VALUES ('Armenia'),
        ('Portugal'),
        ('United Kingdom'),
        ('United States');
+
 
 INSERT INTO city (name, country_id)
 VALUES ('Washington, D.C.', (SELECT id FROM country WHERE name = 'United States')),
@@ -295,6 +297,4 @@ VALUES ('Washington, D.C.', (SELECT id FROM country WHERE name = 'United States'
        ('Melbourne', (SELECT id FROM country WHERE name = 'Australia')),
        ('Brisbane', (SELECT id FROM country WHERE name = 'Australia')),
        ('Perth', (SELECT id FROM country WHERE name = 'Australia'));
-
-END
-TRANSACTION;
+END TRANSACTION;

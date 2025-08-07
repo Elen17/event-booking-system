@@ -1,74 +1,68 @@
 package com.epam.campstone.eventbookingsystem.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
-import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
-@Entity
-@Table(name = "seat")
+import java.math.BigDecimal;
+import java.time.Instant;
+
 @Getter
 @Setter
+@Entity
+@Table(name = "seat")
 public class Seat {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @ColumnDefault("nextval('seat_id_seq')")
+    @Column(name = "id", nullable = false)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "venue_id", nullable = false)
     private Venue venue;
 
-    @Column(name = "section")
+    @Size(max = 50)
+    @Column(name = "section", length = 50)
     private String section;
 
+    @NotNull
     @Column(name = "row_number", nullable = false)
     private Integer rowNumber;
 
+    @NotNull
     @Column(name = "seat_number", nullable = false)
     private Integer seatNumber;
 
+    @NotNull
     @Column(name = "base_price", nullable = false, precision = 10, scale = 2)
-    private Double basePrice;
+    private BigDecimal basePrice;
 
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "status_id", nullable = false)
     private SeatStatus status;
 
-    @Column(name = "is_available", nullable = false)
-    private Boolean isAvailable = true;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "current_booking_id")
+    private Booking currentBooking;
 
+    @ColumnDefault("true")
+    @Column(name = "is_available")
+    private Boolean isAvailable;
+
+    @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "last_booking_update")
-    private LocalDateTime lastBookingUpdate = LocalDateTime.now();
+    private Instant lastBookingUpdate;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @ColumnDefault("CURRENT_TIMESTAMP")
+    @Column(name = "created_at")
+    private Instant createdAt;
 
-    @OneToMany(mappedBy = "seat", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<EventSeat> eventSeats = new HashSet<>();
-
-    // Helper methods for bidirectional relationships
-    public void addEventSeat(EventSeat eventSeat) {
-        eventSeats.add(eventSeat);
-        eventSeat.setSeat(this);
-    }
-
-    public void removeEventSeat(EventSeat eventSeat) {
-        eventSeats.remove(eventSeat);
-        eventSeat.setSeat(null);
-    }
-
-    // Business logic methods
-    public boolean isBookedForEvent(Event event) {
-        return eventSeats.stream()
-                .anyMatch(es -> es.getEvent().equals(event) &&
-                        (es.getStatus() == SeatStatus.RESERVED || es.getStatus() == SeatStatus.PURCHASED));
-    }
-
-    public void updateStatus(SeatStatus newStatus) {
-        this.status = newStatus;
-        this.isAvailable = newStatus == SeatStatus.AVAILABLE;
-        this.lastBookingUpdate = LocalDateTime.now();
-    }
 }

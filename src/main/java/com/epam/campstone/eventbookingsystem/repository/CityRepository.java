@@ -9,10 +9,10 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface CityRepository extends JpaRepository<City, Long> {
+public interface CityRepository extends JpaRepository<City, Integer> {
     Optional<City> findByName(String name);
     List<City> findByCountry(Country country);
-    List<City> findByCountryId(Long countryId);
+    List<City> findByCountryId(Integer countryId);
     List<City> findByNameContainingIgnoreCase(String name);
     boolean existsByNameAndCountryId(String name, Long countryId);
 }

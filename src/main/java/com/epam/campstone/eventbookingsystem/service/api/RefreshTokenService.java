@@ -10,7 +10,7 @@ import java.util.Optional;
  * Provides methods to create, find, verify, and delete refresh tokens.
  */
 public interface RefreshTokenService {
-    
+
     /**
      * Creates a new refresh token for the specified user.
      * If a refresh token already exists for the user, it will be deleted first.

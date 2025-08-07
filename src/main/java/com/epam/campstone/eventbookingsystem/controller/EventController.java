@@ -1,6 +1,5 @@
 package com.epam.campstone.eventbookingsystem.controller;
 
-import com.epam.campstone.eventbookingsystem.dto.EventDto;
 import com.epam.campstone.eventbookingsystem.model.Event;
 import com.epam.campstone.eventbookingsystem.service.api.EventService;
 import lombok.extern.slf4j.Slf4j;
@@ -8,13 +7,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import java.time.LocalDateTime;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @RequestMapping("/events")
@@ -27,20 +25,20 @@ public class EventController {
         this.eventService = eventService;
     }
 
-/**
- * Lists events with pagination and sorting options.
- *
- * <p>This method retrieves a paginated list of events, sorted according to
- * the specified parameters. It adds the list of events and pagination details
- * to the model for rendering in the view.
- *
- * @param page the page number to retrieve (default is 0)
- * @param size the number of events per page (default is 10)
- * @param sortBy the attribute to sort the events by (default is "eventDate")
- * @param direction the sorting direction, either "asc" or "desc" (default is "asc")
- * @param model the model to add attributes to
- * @return the view name for the events list
- */
+    /**
+     * Lists events with pagination and sorting options.
+     *
+     * <p>This method retrieves a paginated list of events, sorted according to
+     * the specified parameters. It adds the list of events and pagination details
+     * to the model for rendering in the view.
+     *
+     * @param page      the page number to retrieve (default is 0)
+     * @param size      the number of events per page (default is 10)
+     * @param sortBy    the attribute to sort the events by (default is "eventDate")
+     * @param direction the sorting direction, either "asc" or "desc" (default is "asc")
+     * @param model     the model to add attributes to
+     * @return the view name for the events list
+     */
     @GetMapping
     public String listEvents(
             @RequestParam(defaultValue = "0") int page,
@@ -75,7 +73,7 @@ public class EventController {
      * <p>
      * This method finds an event by ID and adds it to the model for rendering in the view.
      *
-     * @param id the ID of the event to view
+     * @param id    the ID of the event to view
      * @param model the model to add attributes to
      * @return the view name for the event details
      */

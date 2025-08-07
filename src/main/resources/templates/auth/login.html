@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ticketo - Login</title>
     <style>
@@ -12,7 +13,7 @@
 
         body {
             font-family: 'Arial', sans-serif;
-            background: linear-gradient(rgba(15, 15, 25, 0.85), rgba(25, 25, 40, 0.8)),  url('data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAyAGQDASIAAhEBAxEB/8QAHAAAAgIDAQEAAAAAAAAAAAAAAAgABwYJCgsB/8QAOhAAAQMCBAQEAwcDBQEAAAAAAQIDEQAEBQYSITETQVFhBwiBkSJxoQcyscHR4fAUFUJSkrLxFmKC/8QAFwEAAwEAAAAAAAAAAAAAAAAAAAECA//EABoRAQEBAQEBAQAAAAAAAAAAAAEAAgMREzH/2gAMAwEAAhEDEQA/AJqSlKUOI5UKKVCtKVTW81zzaWgtpKVJ1QCCoAK4MRqIEH7w3HXcU8eUfajxyxgsHjOHeIVbtvLZdSlZp2I1O9D3E2/1x7msR5h5I8Xs88LWGi8dGm5t3QGbbVxgqSrSjT8IkAkkAblPG0qlYJj+LYvgVxd4Rg+sZkN6vRJCkEfCeojkSI6bTUOpSlCilKUKKUpQopSlCilKUKKUvJPhvmzF8rvL7JO5cJN2XUkJSpTaS2koK2o0OeJvMGClSkFSe4PbxTy7z9lrPuY7u3u8JZddw4sNNFg3bZSEFxRSklR4a/Dk6k/V7eIbKVCKUpQ4r//Z') center/cover fixed;
+            background: linear-gradient(rgba(15, 15, 25, 0.85), rgba(25, 25, 40, 0.8)),  url('data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAyAGQDASIAAhEBAxEB/8QAHAAAAgIDAQEAAAAAAAAAAAAAAAgABwYJCgsB/8QAOhAAAQMCBAQEAwcDBQEAAAAAAQIDEQAEBQYSITETQVFhBwiBkSJxoQkyscHR4fAUFUJSkrLxFmKC/8QAFwEAAwEAAAAAAAAAAAAAAAAAAAECA//EABoRAQEBAQEBAQAAAAAAAAAAAAEAAgMREzH/2gAMAwEAAhEDEQA/AJqSlKUOI5UKKVCtKVTW81zzaWgtpKVJ1QCCoAK4MRqIEH7w3HXcU8eUfajxyxgsHjOHeIVbtvLZdSlZp2I1O9D3E2/1x7msR5h5I8Xs88LWGi8dGm5t3QGbbVxgqSrSjT8IkAkkAblPG0qlYJj+LYvgVxd4Rg+sZkN6vRJCkEfCeojkSI6bTUOpSlCilKUKKUpQopSlCilKUKKUvJPhvmzF8rvL7JO5cJN2XUkJSpTaS2koK2o0OeJvMGClSkFSe4PbxTy7z9lrPuY7u3u8JZddw4sNNFg3bZSEFxRSklR4a/Dk6k/V7eIbKVCKUpQ4r//Z') center/cover fixed;
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -110,7 +111,7 @@
             cursor: pointer;
             font-size: 16px;
             transition: color 0.3s ease;
-width: 20px;
+            width: 20px;
         }
 
         .password-toggle:hover {
@@ -159,12 +160,47 @@ width: 20px;
             text-decoration: underline;
         }
 
+        /* Error message styling */
+        .error-message {
+            background: rgba(231, 76, 60, 0.2);
+            border: 1px solid #e74c3c;
+            color: #e74c3c;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .success-message {
+            background: rgba(46, 204, 113, 0.2);
+            border: 1px solid #2ecc71;
+            color: #2ecc71;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .field-error {
+            border-color: #e74c3c !important;
+            box-shadow: 0 0 20px rgba(231, 76, 60, 0.3) !important;
+        }
+
+        .field-error-message {
+            color: #e74c3c;
+            font-size: 12px;
+            margin-top: 5px;
+            display: block;
+        }
+
         @media (max-width: 480px) {
             .login-container {
                 padding: 40px 30px;
                 margin: 10px;
             }
-            
+
             .logo h1 {
                 font-size: 2em;
             }
@@ -203,114 +239,160 @@ width: 20px;
     </style>
 </head>
 <body>
-    <div class="login-container" style="opacity: 1; transform: translateY(0px); transition: 0.6s;">
-        <div class="login-content">
-            <div class="logo">
-                <h1>Ticketo</h1>
+<div class="login-container" style="opacity: 1; transform: translateY(0px); transition: 0.6s;">
+    <div class="login-content">
+        <div class="logo">
+            <h1 th:text="${appName ?: 'Ticketo'}">Ticketo</h1>
+        </div>
+
+        <!-- Display error messages -->
+        <div th:if="${error}" class="error-message" th:text="${error}">
+            Invalid username or password
+        </div>
+
+        <!-- Display success messages -->
+        <div th:if="${message}" class="success-message" th:text="${message}">
+            Registration successful
+        </div>
+
+        <!-- Display logout message -->
+        <div th:if="${param.logout}" class="success-message">
+            You have been logged out successfully
+        </div>
+
+        <form th:action="@{/api/auth/login}" method="post" th:object="${loginRequest}">
+            <!-- CSRF token for security -->
+            <input type="hidden" th:name="${_csrf != null} ? ${_csrf.parameterName} : '_csrf'" th:value="${_csrf != null} ? ${_csrf.token} : ''"/>
+
+            <div class="form-group">
+                <label for="username" th:text="#{login.username}">Username</label>
+                <input type="text"
+                       id="username"
+                       th:field="*{email}"
+                       name="username"
+                       th:placeholder="#{login.username.placeholder}"
+                       th:class="${loginRequest != null and #fields.hasErrors('email')} ? 'field-error' : ''"
+                       required>
+                <span th:if="${loginRequest != null and #fields.hasErrors('email')}"
+                      th:errors="*{email}"
+                      class="field-error-message">Username error</span>
             </div>
-            
-            <form id="loginForm">
-                <div class="form-group">
-                    <label for="username">Username</label>
-                    <input type="text" id="username" name="username" required="">
+
+            <div class="form-group">
+                <label for="password" th:text="#{login.password}">Password</label>
+                <div class="input-container">
+                    <input type="password"
+                           id="password"
+                           th:field="*{password}"
+                           name="password"
+                           th:placeholder="#{login.password.placeholder}"
+                           th:class="${loginRequest != null and #fields.hasErrors('password')} ? 'field-error' : ''"
+                           required>
+                    <button type="button" class="password-toggle" id="togglePassword">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
+                            <path d="M73 39.1C63.6 29.7 48.4 29.7 39.1 39.1C29.8 48.5 29.7 63.7 39 73.1L567 601.1C576.4 610.5 591.6 610.5 600.9 601.1C610.2 591.7 610.3 576.5 600.9 567.2L504.5 470.8C507.2 468.4 509.9 466 512.5 463.6C559.3 420.1 590.6 368.2 605.5 332.5C608.8 324.6 608.8 315.8 605.5 307.9C590.6 272.2 559.3 220.2 512.5 176.8C465.4 133.1 400.7 96.2 319.9 96.2C263.1 96.2 214.3 114.4 173.9 140.4L73 39.1zM236.5 202.7C260 185.9 288.9 176 320 176C399.5 176 464 240.5 464 320C464 351.1 454.1 379.9 437.3 403.5L402.6 368.8C415.3 347.4 419.6 321.1 412.7 295.1C399 243.9 346.3 213.5 295.1 227.2C286.5 229.5 278.4 232.9 271.1 237.2L236.4 202.5zM357.3 459.1C345.4 462.3 332.9 464 320 464C240.5 464 176 399.5 176 320C176 307.1 177.7 294.6 180.9 282.7L101.4 203.2C68.8 240 46.4 279 34.5 307.7C31.2 315.6 31.2 324.4 34.5 332.3C49.4 368 80.7 420 127.5 463.4C174.6 507.1 239.3 544 320.1 544C357.4 544 391.3 536.1 421.6 523.4L357.4 459.2z" style="width: 40px; height: 20px;"></path>
+                        </svg>
+                    </button>
                 </div>
-                
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <div class="input-container">
-                        <input type="password" id="password" name="password" required="">
-                        <button type="button" class="password-toggle" id="togglePassword" style="
-    width: 20px;
-"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><!--!Font Awesome Free v7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M73 39.1C63.6 29.7 48.4 29.7 39.1 39.1C29.8 48.5 29.7 63.7 39 73.1L567 601.1C576.4 610.5 591.6 610.5 600.9 601.1C610.2 591.7 610.3 576.5 600.9 567.2L504.5 470.8C507.2 468.4 509.9 466 512.5 463.6C559.3 420.1 590.6 368.2 605.5 332.5C608.8 324.6 608.8 315.8 605.5 307.9C590.6 272.2 559.3 220.2 512.5 176.8C465.4 133.1 400.7 96.2 319.9 96.2C263.1 96.2 214.3 114.4 173.9 140.4L73 39.1zM236.5 202.7C260 185.9 288.9 176 320 176C399.5 176 464 240.5 464 320C464 351.1 454.1 379.9 437.3 403.5L402.6 368.8C415.3 347.4 419.6 321.1 412.7 295.1C399 243.9 346.3 213.5 295.1 227.2C286.5 229.5 278.4 232.9 271.1 237.2L236.4 202.5zM357.3 459.1C345.4 462.3 332.9 464 320 464C240.5 464 176 399.5 176 320C176 307.1 177.7 294.6 180.9 282.7L101.4 203.2C68.8 240 46.4 279 34.5 307.7C31.2 315.6 31.2 324.4 34.5 332.3C49.4 368 80.7 420 127.5 463.4C174.6 507.1 239.3 544 320.1 544C357.4 544 391.3 536.1 421.6 523.4L357.4 459.2z" style="
-    width: 40px;
-    height: 20px;
-"></path></svg></button>
-                    </div>
-                </div>
-                
-                <button type="submit" class="login-btn" id="loginBtn">Login</button>
-            </form>
-            
-            <div class="signup-link">
-                Don't have an account? <a href="file:///C:/Users/elen.khachatryan/epam/capstone%20files/final_ticketo_login.html#" id="signupLink">Sign up</a>
+                <span th:if="${loginRequest != null and #fields.hasErrors('password')}"
+                      th:errors="*{password}"
+                      class="field-error-message">Password error</span>
             </div>
+
+            <!-- Remember me checkbox -->
+            <div class="form-group" th:if="${rememberMeEnabled}">
+                <label>
+                    <input type="checkbox" name="remember-me" th:text="#{login.rememberme}"> Remember me
+                </label>
+            </div>
+
+            <button type="submit" class="login-btn" id="loginBtn" th:text="#{login.submit}">Login</button>
+        </form>
+
+        <div class="signup-link">
+            <span th:text="#{login.signup.text}">Don't have an account?</span>
+            <a th:href="@{/register}" th:text="#{login.signup.link}">Sign up</a>
+        </div>
+
+        <!-- Additional links -->
+        <div class="signup-link" style="margin-top: 10px;">
+            <a th:href="@{/forgot-password}" th:text="#{login.forgot.password}">Forgot password?</a>
         </div>
     </div>
+</div>
 
-    <script>
-        // Password toggle functionality
-        const togglePassword = document.getElementById('togglePassword');
-        const passwordInput = document.getElementById('password');
+<script th:inline="javascript">
+    // Get messages from Thymeleaf
+    const messages = {
+        fillAllFields: /*[[#{login.error.fillfields}]]*/ 'Please fill in all fields',
+        welcome: /*[[#{login.success.welcome}]]*/ 'Welcome back',
+        signupRedirect: /*[[#{login.signup.redirect}]]*/ 'Redirect to sign up page'
+    };
 
-        togglePassword.addEventListener('click', function() {
-            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordInput.setAttribute('type', type);
-            this.textContent = type === 'password' ? '=A' : '=H';
+    // Password toggle functionality
+    const togglePassword = document.getElementById('togglePassword');
+    const passwordInput = document.getElementById('password');
+
+    togglePassword.addEventListener('click', function() {
+        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordInput.setAttribute('type', type);
+        // You can change the icon here if needed
+    });
+
+    // Form submission handling
+    const loginForm = document.querySelector('form');
+    const loginBtn = document.getElementById('loginBtn');
+    const loginContainer = document.querySelector('.login-container');
+
+    loginForm.addEventListener('submit', function(e) {
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+
+        if (!username || !password) {
+            e.preventDefault();
+            alert(messages.fillAllFields);
+            return;
+        }
+
+        // Add loading state
+        loginContainer.classList.add('loading');
+        loginBtn.textContent = '';
+    });
+
+    // Input focus effects
+    const inputs = document.querySelectorAll('input[type="text"], input[type="password"]');
+    inputs.forEach(input => {
+        input.addEventListener('focus', function() {
+            this.parentElement.style.transform = 'scale(1.02)';
         });
 
-        // Form submission handling
-        const loginForm = document.getElementById('loginForm');
-        const loginBtn = document.getElementById('loginBtn');
-        const loginContainer = document.querySelector('.login-container');
+        input.addEventListener('blur', function() {
+            this.parentElement.style.transform = 'scale(1)';
+        });
+    });
 
-        loginForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
+    // Add subtle animations on load
+    window.addEventListener('load', function() {
+        loginContainer.style.opacity = '0';
+        loginContainer.style.transform = 'translateY(20px)';
 
-            if (!username || !password) {
-                alert('Please fill in all fields');
-                return;
+        setTimeout(() => {
+            loginContainer.style.transition = 'all 0.6s ease';
+            loginContainer.style.opacity = '1';
+            loginContainer.style.transform = 'translateY(0)';
+        }, 100);
+    });
+
+    // Remove error styling on input
+    inputs.forEach(input => {
+        input.addEventListener('input', function() {
+            this.classList.remove('field-error');
+            const errorSpan = this.parentElement.querySelector('.field-error-message');
+            if (errorSpan) {
+                errorSpan.style.display = 'none';
             }
-
-            // Add loading state
-            loginContainer.classList.add('loading');
-            loginBtn.textContent = '';
-
-            // Simulate login process
-            setTimeout(() => {
-                loginContainer.classList.remove('loading');
-                loginBtn.textContent = 'Login';
-                
-                // Simulate successful login
-                alert(`Welcome back, ${username}!`);
-                
-                // Here you would typically redirect or make an API call
-                console.log('Login attempt:', { username, password: '***' });
-            }, 2000);
         });
-
-        // Sign up link handling
-        document.getElementById('signupLink').addEventListener('click', function(e) {
-            e.preventDefault();
-            alert('Redirect to sign up page');
-        });
-
-        // Input focus effects
-        const inputs = document.querySelectorAll('input');
-        inputs.forEach(input => {
-            input.addEventListener('focus', function() {
-                this.parentElement.style.transform = 'scale(1.02)';
-            });
-            
-            input.addEventListener('blur', function() {
-                this.parentElement.style.transform = 'scale(1)';
-            });
-        });
-
-        // Add subtle animations on load
-        window.addEventListener('load', function() {
-            loginContainer.style.opacity = '0';
-            loginContainer.style.transform = 'translateY(20px)';
-            
-            setTimeout(() => {
-                loginContainer.style.transition = 'all 0.6s ease';
-                loginContainer.style.opacity = '1';
-                loginContainer.style.transform = 'translateY(0)';
-            }, 100);
-        });
-    </script>
-
-
-</body></html>
+    });
+</script>
+</body>
+</html>

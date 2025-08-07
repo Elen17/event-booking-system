@@ -9,7 +9,7 @@ rm -rf $HOME/docker/volumes/postgres/data
 docker run --rm --name pg-docker \
     -e POSTGRES_PASSWORD=postgres \
     -e POSTGRES_DB=event_booking \
-    -d -p 5432:5432 \
+    -d -p 5434:5432 \
     -v $HOME/docker/volumes/postgres:/var/lib/postgresql postgres:17
 
 sleep 3

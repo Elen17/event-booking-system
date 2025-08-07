@@ -20,7 +20,7 @@ public class CountryServiceImpl implements CountryService {
     }
 
     @Override
-    public Optional<Country> findById(Long id) {
+    public Optional<Country> findById(Integer id) {
         return countryRepository.findById(id);
     }
 
@@ -45,7 +45,7 @@ public class CountryServiceImpl implements CountryService {
 
     @Override
     @Transactional
-    public void deleteById(Long id) {
+    public void deleteById(Integer id) {
         if (id == null) {
             throw new IllegalArgumentException("Country ID cannot be null");
         }
@@ -53,7 +53,7 @@ public class CountryServiceImpl implements CountryService {
     }
 
     @Override
-    public boolean existsById(Long id) {
+    public boolean existsById(Integer id) {
         return id != null && countryRepository.existsById(id);
     }
 

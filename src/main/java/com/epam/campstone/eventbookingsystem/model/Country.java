@@ -1,37 +1,28 @@
 package com.epam.campstone.eventbookingsystem.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
-import java.util.HashSet;
-import java.util.Set;
+import org.hibernate.annotations.ColumnDefault;
 
-@Entity
-@Table(name = "country")
 @Getter
 @Setter
+@Entity
+@Table(name = "country")
 public class Country {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @ColumnDefault("nextval('country_id_seq')")
+    @Column(name = "id", nullable = false)
+    private Integer id;
 
-    @Column(nullable = false, unique = true)
+    @Size(max = 255)
+    @NotNull
+    @Column(name = "name", nullable = false)
     private String name;
 
-    @OneToMany(mappedBy = "country", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<City> cities = new HashSet<>();
-
-    @OneToMany(mappedBy = "country", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<User> users = new HashSet<>();
-
-    // Helper methods for bidirectional relationship
-    public void addCity(City city) {
-        cities.add(city);
-        city.setCountry(this);
-    }
-
-    public void removeCity(City city) {
-        cities.remove(city);
-        city.setCountry(null);
-    }
 }

@@ -10,6 +10,7 @@ import com.epam.campstone.eventbookingsystem.security.UserDetailsImpl;
 import com.epam.campstone.eventbookingsystem.security.jwt.JwtUtils;
 import com.epam.campstone.eventbookingsystem.service.api.LoginService;
 import com.epam.campstone.eventbookingsystem.service.api.RefreshTokenService;
+import com.epam.campstone.eventbookingsystem.util.PasswordUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,6 +21,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -55,6 +57,13 @@ public class LoginServiceImpl implements LoginService {
                 log.error("User account is locked: {}", userDetails.getUsername());
                 throw new UserNotActiveException("User account is not active");
             }
+
+            // check if user password is right
+            if (!PasswordUtil.verifyPassword(loginRequest.getPassword(), userDetails.getPassword(), userDetails.getSalt())) {
+                log.error("User password is incorrect: {}", userDetails.getUsername());
+                throw new AuthenticationException("Invalid email or password");
+            }
+
             log.info("Generating JWT token for user: {}", userDetails.getUsername());
             String jwt = jwtUtils.generateJwtToken(userDetails);
 
@@ -64,12 +73,12 @@ public class LoginServiceImpl implements LoginService {
                     .collect(Collectors.toList());
 
             // Generate refresh token
-            RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
-
+            log.info("Generating refresh token for user: {}", userDetails.getUsername());
+            String randomToken = UUID.randomUUID().toString();
             // Return JWT response
             return new JwtResponseDto(
                     jwt,
-                    refreshToken.getToken(),
+                    randomToken,
                     userDetails.getId(),
                     userDetails.getUsername(),
                     roles);

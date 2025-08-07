@@ -1,9 +1,12 @@
 package com.epam.campstone.eventbookingsystem.controller;
 
+import com.epam.campstone.eventbookingsystem.dto.LoginRequestDto;
 import com.epam.campstone.eventbookingsystem.dto.UserRegistrationDto;
 import com.epam.campstone.eventbookingsystem.model.Country;
 import com.epam.campstone.eventbookingsystem.service.api.CountryService;
+import com.epam.campstone.eventbookingsystem.service.api.RegistrationService;
 import com.epam.campstone.eventbookingsystem.service.api.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -20,11 +23,14 @@ import java.util.List;
 public class AuthController {
 
     private final UserService userService;
+    private final RegistrationService registrationService;
     private final CountryService countryService;
 
     public AuthController(UserService userService,
+                          RegistrationService registrationService,
                           CountryService countryService) {
         this.userService = userService;
+        this.registrationService = registrationService;
         this.countryService = countryService;
     }
 
@@ -39,26 +45,35 @@ public class AuthController {
      *
      * @param error     the error query parameter
      * @param logout    the logout query parameter
-     * @param registered the registered query parameter
      * @param model     the model to add attributes to
      * @return the login form view
      */
     @GetMapping("/login")
-    public String showLoginForm(@RequestParam(required = false) String error,
-                                @RequestParam(required = false) String logout,
-                                @RequestParam(required = false) String registered,
-                                Model model) {
+    public String showLoginForm(Model model,
+                                @RequestParam(value = "error", required = false) String error,
+                                @RequestParam(value = "logout", required = false) String logout) {
+
         log.info("Showing login form");
 
+        // Add empty login request object for form binding
+        if (!model.containsAttribute("loginRequest")) {
+            model.addAttribute("loginRequest", new LoginRequestDto());
+        }
+
+        // Handle error messages
         if (error != null) {
-            model.addAttribute("errorMessage", "Invalid email or password. Please try again.");
+            model.addAttribute("error", "Invalid username or password");
         }
+
+        // Handle logout message
         if (logout != null) {
-            model.addAttribute("successMessage", "You have been logged out successfully.");
+            model.addAttribute("message", "You have been logged out successfully");
         }
-        if (registered != null) {
-            model.addAttribute("successMessage", "Registration successful! Please log in with your credentials.");
-        }
+
+        // Add application configuration
+        model.addAttribute("appName", "Ticketo");
+        model.addAttribute("rememberMeEnabled", true);
+
         log.info("Redirecting to login page: auth/login");
         return "auth/login";
     }
@@ -123,7 +138,7 @@ public class AuthController {
 
         try {
             log.info("Registering new user successfully: {}", userRegistrationDto);
-            userService.registerNewUser(userRegistrationDto);
+            registrationService.registerUser(userRegistrationDto);
             return "redirect:/auth/login?registered";
         } catch (Exception e) {
             log.error("Registration failed: {}", e.getMessage());

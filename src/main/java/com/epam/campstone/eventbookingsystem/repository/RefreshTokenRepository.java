@@ -28,15 +28,8 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long
     /**
      * Delete all refresh tokens associated with a user
      * @param user the user whose tokens should be deleted
-     * @return the number of tokens deleted
      */
     @Modifying
-    int deleteByUser(User user);
+    void deleteByUser(User user);
 
-    /**
-     * Check if a refresh token exists for the given user
-     * @param user the user to check
-     * @return true if a refresh token exists for the user, false otherwise
-     */
-    boolean existsByUser(User user);
 }

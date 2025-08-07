@@ -34,7 +34,7 @@ public class UserRegistrationDto {
     @NotBlank(message = "Please confirm your password")
     private String confirmPassword;
 
-    private Long countryId;
+    private Integer countryId;
 
     // Custom validation method to ensure passwords match
     public boolean isPasswordMatching() {

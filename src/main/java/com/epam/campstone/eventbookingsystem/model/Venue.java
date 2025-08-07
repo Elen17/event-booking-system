@@ -1,62 +1,38 @@
 package com.epam.campstone.eventbookingsystem.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
-import java.util.HashSet;
-import java.util.Set;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
-@Entity
-@Table(name = "venue")
 @Getter
 @Setter
+@Entity
+@Table(name = "venue")
 public class Venue {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @ColumnDefault("nextval('venue_id_seq')")
+    @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(nullable = false)
+    @Size(max = 255)
+    @NotNull
+    @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(nullable = false)
-    private String address;
-
-    @ManyToOne(fetch = FetchType.LAZY)
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "city_id", nullable = false)
     private City city;
 
-    @OneToMany(mappedBy = "venue", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Event> events = new HashSet<>();
+    @Size(max = 255)
+    @NotNull
+    @Column(name = "address", nullable = false)
+    private String address;
 
-    @OneToMany(mappedBy = "venue", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Seat> seats = new HashSet<>();
-
-    public static Venue create(String name, String address, City city) {
-        Venue venue = new Venue();
-        venue.setName(name);
-        venue.setAddress(address);
-        venue.setCity(city);
-        return venue;
-    }
-
-    // Helper methods for bidirectional relationships
-    public void addEvent(Event event) {
-        events.add(event);
-        event.setVenue(this);
-    }
-
-    public void removeEvent(Event event) {
-        events.remove(event);
-        event.setVenue(null);
-    }
-
-    public void addSeat(Seat seat) {
-        seats.add(seat);
-        seat.setVenue(this);
-    }
-
-    public void removeSeat(Seat seat) {
-        seats.remove(seat);
-        seat.setVenue(null);
-    }
 }

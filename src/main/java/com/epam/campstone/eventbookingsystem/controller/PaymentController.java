@@ -33,9 +33,9 @@ public class PaymentController {
      * The method also checks if the booking has already been paid for.
      * If it has been paid, it redirects to the payment status page.
      *
-     * @param bookingId The ID of the booking to pay for.
+     * @param bookingId   The ID of the booking to pay for.
      * @param currentUser The user performing the action.
-     * @param model The model to add attributes to.
+     * @param model       The model to add attributes to.
      * @return The view name for the payment form.
      */
     @GetMapping("/new/{bookingId}")
@@ -45,7 +45,7 @@ public class PaymentController {
             Model model) {
 
         log.info("Showing payment form for booking: {} for user: {}", bookingId, currentUser.getUsername());
-        
+
         if (!model.containsAttribute("paymentRequest")) {
             PaymentRequestDto paymentRequest = new PaymentRequestDto();
             paymentRequest.setBookingId(bookingId);
@@ -53,10 +53,10 @@ public class PaymentController {
         }
 
         PaymentResponseDto paymentStatus = paymentService.getPaymentStatus(bookingId, currentUser.getUsername());
-        log.info("Payment status for booking {}: {}",bookingId, paymentStatus);
+        log.info("Payment status for booking {}: {}", bookingId, paymentStatus);
         model.addAttribute("bookingId", bookingId);
         model.addAttribute("paymentStatus", paymentStatus);
-        
+
         return "payments/payment-form";
     }
 
@@ -69,9 +69,9 @@ public class PaymentController {
      * If the payment fails, it redirects to the payment form with an error message.
      * If an exception occurs, it redirects to the payment form with an error message.
      *
-     * @param paymentRequest The payment request containing the booking ID and card details.
-     * @param bindingResult The binding result to hold validation errors.
-     * @param currentUser The user performing the action.
+     * @param paymentRequest     The payment request containing the booking ID and card details.
+     * @param bindingResult      The binding result to hold validation errors.
+     * @param currentUser        The user performing the action.
      * @param redirectAttributes Attributes for flash messages during redirection.
      * @return The view name or redirect URL.
      */
@@ -81,30 +81,30 @@ public class PaymentController {
             BindingResult bindingResult,
             @AuthenticationPrincipal UserDetails currentUser,
             RedirectAttributes redirectAttributes) {
-        
+
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute(
-                "org.springframework.validation.BindingResult.paymentRequest", 
-                bindingResult);
+                    "org.springframework.validation.BindingResult.paymentRequest",
+                    bindingResult);
             redirectAttributes.addFlashAttribute("paymentRequest", paymentRequest);
             return "redirect:/payments/new/" + paymentRequest.getBookingId();
         }
-        
+
         try {
             PaymentResponseDto response = paymentService.processPayment(paymentRequest, currentUser.getUsername());
-            
+
             if (response.isSuccess()) {
-                redirectAttributes.addFlashAttribute("successMessage", 
-                    "Payment processed successfully! Transaction ID: " + response.getTransactionId());
+                redirectAttributes.addFlashAttribute("successMessage",
+                        "Payment processed successfully! Transaction ID: " + response.getTransactionId());
                 return "redirect:/bookings/" + paymentRequest.getBookingId();
             } else {
-                redirectAttributes.addFlashAttribute("errorMessage", 
-                    "Payment failed: " + response.getMessage());
+                redirectAttributes.addFlashAttribute("errorMessage",
+                        "Payment failed: " + response.getMessage());
                 return "redirect:/payments/new/" + paymentRequest.getBookingId();
             }
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", 
-                "Error processing payment: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage",
+                    "Error processing payment: " + e.getMessage());
             return "redirect:/payments/new/" + paymentRequest.getBookingId();
         }
     }
@@ -117,11 +117,11 @@ public class PaymentController {
             @PathVariable Long bookingId,
             @AuthenticationPrincipal UserDetails currentUser,
             Model model) {
-        
+
         PaymentResponseDto paymentStatus = paymentService.getPaymentStatus(bookingId, currentUser.getUsername());
         model.addAttribute("paymentStatus", paymentStatus);
         model.addAttribute("bookingId", bookingId);
-        
+
         return "payments/payment-status";
     }
 }

@@ -22,19 +22,7 @@ public class RefreshToken {
     @Column(nullable = false, unique = true)
     private String token;
 
-    @Column(nullable = false)
+    @Column(name = "expiry_date", nullable = false)
     private Instant expiryDate;
 
-    public RefreshToken() {
-    }
-
-    public RefreshToken(User user, String token, Instant expiryDate) {
-        this.user = user;
-        this.token = token;
-        this.expiryDate = expiryDate;
-    }
-
-    public boolean isExpired() {
-        return expiryDate.compareTo(Instant.now()) < 0;
-    }
 }

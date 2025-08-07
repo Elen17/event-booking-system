@@ -1,112 +1,79 @@
 package com.epam.campstone.eventbookingsystem.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.List;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
-@Entity
-@Table(name = "booking")
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 @Getter
 @Setter
+@Entity
+@Table(name = "booking")
 public class Booking {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @ColumnDefault("nextval('booking_id_seq')")
+    @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(name = "booking_reference", unique = true, nullable = false, length = 20)
+    @Size(max = 20)
+    @NotNull
+    @Column(name = "booking_reference", nullable = false, length = 20)
     private String bookingReference;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "event_id", nullable = false)
     private Event event;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "seat_id", nullable = false)
     private Seat seat;
 
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "booking_status_id", nullable = false)
-    private BookingStatus status;
+    private BookingStatus bookingStatus;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "booking_group_id")
-    private BookingGroup bookingGroup;
-
-    @OneToMany(mappedBy = "currentBooking", fetch = FetchType.LAZY)
-    private List<Seat> currentSeats;
-
-    @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Ticket> tickets;
-
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @ColumnDefault("CURRENT_TIMESTAMP")
+    @Column(name = "created_at")
+    private Instant createdAt;
 
     @Column(name = "expires_at")
-    private LocalDateTime expiresAt;
+    private Instant expiresAt;
 
     @Column(name = "confirmed_at")
-    private LocalDateTime confirmedAt;
+    private Instant confirmedAt;
 
     @Column(name = "purchased_at")
-    private LocalDateTime purchasedAt;
+    private Instant purchasedAt;
 
     @Column(name = "cancelled_at")
-    private LocalDateTime cancelledAt;
+    private Instant cancelledAt;
 
-    @Column(nullable = false, precision = 10, scale = 2)
+    @NotNull
+    @Column(name = "price", nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
 
     @Column(name = "payment_date")
-    private LocalDateTime paymentDate;
+    private Instant paymentDate;
 
-    // Business logic methods
-    public boolean isExpired() {
-        return expiresAt != null && expiresAt.isBefore(LocalDateTime.now());
-    }
+    @OneToMany(mappedBy = "currentBooking")
+    private Set<Seat> seats = new LinkedHashSet<>();
 
-    public boolean isConfirmed() {
-        return confirmedAt != null;
-    }
-
-    public boolean isPurchased() {
-        return purchasedAt != null;
-    }
-
-    public boolean isCancelled() {
-        return cancelledAt != null;
-    }
-
-    public boolean canBeConfirmed() {
-        return !isCancelled() && !isExpired() && !isPurchased();
-    }
-
-    // Helper methods for status transitions
-    public void confirm() {
-        if (canBeConfirmed()) {
-            this.status = BookingStatus.CONFIRMED_BOOKING;
-            this.confirmedAt = LocalDateTime.now();
-        }
-    }
-
-    public void purchase() {
-        if (status == BookingStatus.CONFIRMED_BOOKING) {
-            this.status = BookingStatus.PURCHASED;
-            this.purchasedAt = LocalDateTime.now();
-            this.paymentDate = LocalDateTime.now();
-        }
-    }
-
-    public void cancel() {
-        if (!isCancelled() && !isPurchased()) {
-            this.status = BookingStatus.CANCELLED;
-            this.cancelledAt = LocalDateTime.now();
-        }
-    }
 }

@@ -2,16 +2,18 @@ package com.epam.campstone.eventbookingsystem.service.impl;
 
 import com.epam.campstone.eventbookingsystem.dto.EventDto;
 import com.epam.campstone.eventbookingsystem.exception.ResourceNotFoundException;
+import com.epam.campstone.eventbookingsystem.model.City;
 import com.epam.campstone.eventbookingsystem.model.Event;
 import com.epam.campstone.eventbookingsystem.model.Venue;
+import com.epam.campstone.eventbookingsystem.repository.CityRepository;
 import com.epam.campstone.eventbookingsystem.repository.EventRepository;
+import com.epam.campstone.eventbookingsystem.repository.VenueRepository;
 import com.epam.campstone.eventbookingsystem.service.api.EventService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -19,8 +21,14 @@ import java.util.Optional;
 public class EventServiceImpl implements EventService {
 
     private final EventRepository eventRepository;
+    private final CityRepository cityRepository;
+    private final VenueRepository venueRepository;
 
-    public EventServiceImpl(EventRepository eventRepository) {
+    public EventServiceImpl(EventRepository eventRepository,
+                            CityRepository cityRepository,
+                            VenueRepository venueRepository) {
+        this.venueRepository = venueRepository;
+        this.cityRepository = cityRepository;
         this.eventRepository = eventRepository;
     }
 
@@ -40,6 +48,8 @@ public class EventServiceImpl implements EventService {
     public void createEvent(EventDto eventDto) {
         Event event = new Event();
         mapDtoToEntity(eventDto, event);
+        this.venueRepository.save(event.getVenue());
+
         eventRepository.save(event);
     }
 
@@ -69,8 +79,8 @@ public class EventServiceImpl implements EventService {
         if (event.getAvailableAttendeesCapacity() < count) {
             throw new IllegalStateException("Not enough available spots");
         }
-
-        event.setAvailableAttendeesCapacity(event.getAvailableAttendeesCapacity() - count);
+        Integer availableSpots = Math.max((event.getAvailableAttendeesCapacity() - count), 0);
+        event.setAvailableAttendeesCapacity(availableSpots);
         eventRepository.save(event);
     }
 
@@ -85,10 +95,21 @@ public class EventServiceImpl implements EventService {
     }
 
     private void mapDtoToEntity(EventDto dto, Event entity) {
-        // todo implement
         entity.setTitle(dto.getTitle());
         entity.setDescription(dto.getDescription());
         entity.setEventDate(dto.getEventDate().toLocalDate());
+        entity.setStartTime(dto.getEventDate().toLocalTime());
+
+        Venue venue = new Venue();
+        venue.setName(dto.getVenue().getName());
+        venue.setAddress(dto.getVenue().getAddress());
+        City city = cityRepository.findById(dto.getVenue().getCityId())
+                .orElseThrow(() -> new ResourceNotFoundException("City not found with id: " + dto.getVenue().getCityId()));
+
+        venue.setCity(city);
+        venue.setName(dto.getVenue().getName());
+
+        entity.setVenue(venue);
         entity.setAvailableAttendeesCapacity(dto.getAvailableAttendeesCapacity());
     }
 }

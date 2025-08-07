@@ -16,7 +16,7 @@ public interface CountryService {
      * @param id the country ID
      * @return an Optional containing the country if found
      */
-    Optional<Country> findById(Long id);
+    Optional<Country> findById(Integer id);
 
     /**
      * Find a country by its name (case-insensitive).
@@ -46,7 +46,7 @@ public interface CountryService {
      *
      * @param id the country ID
      */
-    void deleteById(Long id);
+    void deleteById(Integer id);
 
     /**
      * Check if a country with the given ID exists.
@@ -54,5 +54,5 @@ public interface CountryService {
      * @param id the country ID
      * @return true if a country with the ID exists, false otherwise
      */
-    boolean existsById(Long id);
+    boolean existsById(Integer id);
 }

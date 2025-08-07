@@ -1,24 +1,30 @@
 package com.epam.campstone.eventbookingsystem.service.impl;
 
 import com.epam.campstone.eventbookingsystem.dto.BookingDto;
+import com.epam.campstone.eventbookingsystem.dto.SeatDto;
 import com.epam.campstone.eventbookingsystem.exception.ResourceNotFoundException;
-import com.epam.campstone.eventbookingsystem.model.*;
-import com.epam.campstone.eventbookingsystem.repository.BookingRepository;
-import com.epam.campstone.eventbookingsystem.repository.EventRepository;
-import com.epam.campstone.eventbookingsystem.repository.TicketRepository;
-import com.epam.campstone.eventbookingsystem.repository.UserRepository;
+import com.epam.campstone.eventbookingsystem.model.Booking;
+import com.epam.campstone.eventbookingsystem.model.Event;
+import com.epam.campstone.eventbookingsystem.model.Seat;
+import com.epam.campstone.eventbookingsystem.model.User;
+import com.epam.campstone.eventbookingsystem.repository.*;
 import com.epam.campstone.eventbookingsystem.service.api.BookingService;
+import jakarta.validation.constraints.NotNull;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
+import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
+@Slf4j
 @Service
 @Transactional
 public class BookingServiceImpl implements BookingService {
@@ -26,54 +32,56 @@ public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
-    private final TicketRepository ticketRepository;
+    private final SeatRepository seatRepository;
+    private final BookingStatusRepository bookingStatusRepository;
+    private final SeatStatusRepository seatStatusRepository;
 
     @Autowired
     public BookingServiceImpl(BookingRepository bookingRepository,
-                            EventRepository eventRepository,
-                            UserRepository userRepository,
-                            TicketRepository ticketRepository) {
+                              EventRepository eventRepository,
+                              UserRepository userRepository,
+                              SeatRepository seatRepository,
+                              BookingStatusRepository bookingStatusRepository,
+                              SeatStatusRepository seatStatusRepository) {
         this.bookingRepository = bookingRepository;
         this.eventRepository = eventRepository;
         this.userRepository = userRepository;
-        this.ticketRepository = ticketRepository;
+        this.seatRepository = seatRepository;
+        this.bookingStatusRepository = bookingStatusRepository;
+        this.seatStatusRepository = seatStatusRepository;
     }
 
     @Override
     public Booking createBooking(String userEmail, BookingDto bookingDto) {
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + userEmail));
-        
+
         Event event = eventRepository.findById(bookingDto.getEventId())
                 .orElseThrow(() -> new ResourceNotFoundException("Event not found with id: " + bookingDto.getEventId()));
-        
+
         // Check if there are enough available spots
-        if (event.getAvailableAttendeesCapacity() < bookingDto.getNumberOfTickets()) {
+        if (event.getAvailableAttendeesCapacity() < bookingDto.getSeats().size()) {
             throw new IllegalStateException("Not enough available spots for this event");
         }
-        
+
         // Create booking
         Booking booking = new Booking();
 
-        // todo implement
-//        booking.setUser(user);
-//        booking.setEvent(event);
-//        booking.setBookingDate(LocalDateTime.now());
-//        booking.setNumberOfTickets(bookingDto.getNumberOfTickets());
-//        booking.setPrice(calculateTotalPrice(event.getTicketPrice(), bookingDto.getNumberOfTickets()));
-//        booking.setBookingNumber(generateBookingNumber());
-//        booking.setStatus(Booking.BookingStatus.CONFIRMED);
+        booking.setUser(user);
+        booking.setEvent(event);
+        booking.setCreatedAt(LocalDateTime.now().toInstant(ZoneOffset.UTC));
+
+        booking.setPrice(this.calculateTotalPrice(bookingDto.getSeats()));
+        booking.setBookingStatus(bookingStatusRepository.findByName("CONFIRMED_BOOKING").get());
+        booking.setSeats(this.createSeats(bookingDto.getSeats()));
 //
         Booking savedBooking = bookingRepository.save(booking);
-//
-//        // Generate tickets
-//        List<Ticket> tickets = generateTickets(savedBooking, bookingDto.getNumberOfTickets());
-//        bookingRepository.saveAll(tickets);
-        
+
         // Update available spots
-        event.setAvailableAttendeesCapacity(event.getAvailableAttendeesCapacity() - bookingDto.getNumberOfTickets());
+        event.setAvailableAttendeesCapacity(event.getAvailableAttendeesCapacity() - bookingDto.getSeats().size());
+
         eventRepository.save(event);
-        
+
         return savedBooking;
     }
 
@@ -84,26 +92,27 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public boolean cancelBooking(Long bookingId, String userEmail) {
+    public void cancelBooking(Long bookingId, String userEmail) {
         Booking booking = bookingRepository.findByIdAndUserEmail(bookingId, userEmail)
                 .orElseThrow(() -> new ResourceNotFoundException("Booking not found with id: " + bookingId));
-        
-        if (booking.getStatus() == BookingStatus.CANCELLED) {
-            return false; // Already cancelled
-        }
-        
+
+        List<Long> seats = booking.getSeats().stream().map(Seat::getId).toList();
+        log.info("Booking with id: {} is already cancelled", bookingId);
+        booking.setSeats(Collections.emptySet());
+
+        // set status for seats available
+        this.seatRepository.updateSeatsStatus(seats, seatStatusRepository.findByName("AVAILABLE").get());
+
         // Update booking status
-        booking.setStatus(BookingStatus.CANCELLED);
+        booking.setBookingStatus(bookingStatusRepository.findByName("CANCELLED").get());
         bookingRepository.save(booking);
-        
+
         // Return tickets to available capacity
         Event event = booking.getEvent();
         event.setAvailableAttendeesCapacity(
-                event.getAvailableAttendeesCapacity() + booking.getTickets().size()
-        );
+                event.getAvailableAttendeesCapacity() + seats.size());
+
         eventRepository.save(event);
-        
-        return true;
     }
 
     @Override
@@ -114,31 +123,29 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Ticket> findTicketsByBookingId(Long bookingId) {
-        return ticketRepository.findByBookingId(bookingId);
+    public List<Seat> findSeatsByBookingId(Long bookingId) {
+        return
+                bookingRepository.findSeatsByBooking(bookingId);
     }
-    
-    private List<Ticket> generateTickets(Booking booking, int count) {
-        return IntStream.range(0, count)
-                .mapToObj(i -> {
-                    Ticket ticket = new Ticket();
-                    ticket.setBooking(booking);
-                    ticket.setTicketNumber(generateTicketNumber(booking.getBookingReference(), i + 1));
-                    ticket.setTicketStatus(Ticket.TicketStatus.ACTIVE);
-                    return ticket;
+
+    private BigDecimal calculateTotalPrice(List<SeatDto> seats) {
+        return seats.stream()
+                .map(SeatDto::getBasePrice).reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    private Set<Seat> createSeats(@NotNull(message = "Seats are required") List<SeatDto> seats) {
+        return seats.stream()
+                .map(seatDto -> {
+                    Seat seat = new Seat();
+
+                    seat.setRowNumber(seatDto.getRowNumber());
+                    seat.setSeatNumber(seatDto.getSeatNumber());
+                    seat.setSection(seatDto.getSection());
+                    seat.setBasePrice(seatDto.getBasePrice());
+                    seat.setIsAvailable(false);
+
+                    return seat;
                 })
-                .collect(Collectors.toList());
-    }
-    
-    private String generateBookingNumber() {
-        return "BK" + UUID.randomUUID().toString().replace("-", "").substring(0, 12).toUpperCase();
-    }
-    
-    private String generateTicketNumber(String bookingNumber, int index) {
-        return bookingNumber + "-T" + String.format("%03d", index);
-    }
-    
-    private double calculateTotalPrice(double ticketPrice, int numberOfTickets) {
-        return ticketPrice * numberOfTickets;
+                .collect(Collectors.toSet());
     }
 }

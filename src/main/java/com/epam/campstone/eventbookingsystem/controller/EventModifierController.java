@@ -1,6 +1,7 @@
 package com.epam.campstone.eventbookingsystem.controller;
 
 import com.epam.campstone.eventbookingsystem.dto.EventDto;
+import com.epam.campstone.eventbookingsystem.dto.VenueDto;
 import com.epam.campstone.eventbookingsystem.model.Event;
 import com.epam.campstone.eventbookingsystem.service.api.EventService;
 import lombok.extern.slf4j.Slf4j;
@@ -80,7 +81,7 @@ public class EventModifierController {
      * This method shows the event edit form, pre-populated with the event details.
      * If the event is not found, it throws a runtime exception.
      *
-     * @param id   The ID of the event to edit.
+     * @param id    The ID of the event to edit.
      * @param model The model to add attributes to.
      * @return The view name for the event edit form.
      */
@@ -94,9 +95,13 @@ public class EventModifierController {
             eventDto.setId(event.getId());
             eventDto.setTitle(event.getTitle());
             eventDto.setDescription(event.getDescription());
-            eventDto.setLocation(event.getVenue().getName());
+            VenueDto venueDto = new VenueDto();
+            venueDto.setId(event.getVenue().getId());
+            venueDto.setName(event.getVenue().getName());
+            venueDto.setCityId(event.getVenue().getCity().getId());
+            eventDto.setVenue(venueDto);
             eventDto.setEventDate(LocalDateTime.of(event.getEventDate(), event.getStartTime()));
-            eventDto.setAvailableAttendeesCapacity(event.getAvailableAttendeesCapacity());
+            eventDto.setAttendeesCapacity(event.getAvailableAttendeesCapacity());
 
             model.addAttribute("event", eventDto);
         }
@@ -112,8 +117,8 @@ public class EventModifierController {
      * success or failure. On success, redirects to the events list; on failure, redirects back
      * to the event edit form with error messages.</p>
      *
-     * @param id             The ID of the event to update.
-     * @param eventDto       The data transfer object containing event details.
+     * @param id                 The ID of the event to update.
+     * @param eventDto           The data transfer object containing event details.
      * @param redirectAttributes Attributes for flash messages during redirection.
      * @return A redirection to the events list on success, or to the event edit form on error.
      */
