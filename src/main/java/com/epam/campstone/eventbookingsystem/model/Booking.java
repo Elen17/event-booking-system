@@ -20,8 +20,8 @@ import java.util.Set;
 @Table(name = "booking")
 public class Booking {
     @Id
-    @ColumnDefault("nextval('booking_id_seq')")
     @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Size(max = 20)

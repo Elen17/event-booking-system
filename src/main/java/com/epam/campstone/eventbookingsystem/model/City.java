@@ -15,8 +15,8 @@ import org.hibernate.annotations.OnDeleteAction;
 @Table(name = "city")
 public class City {
     @Id
-    @ColumnDefault("nextval('city_id_seq')")
     @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @Size(max = 255)

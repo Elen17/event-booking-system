@@ -17,8 +17,8 @@ import java.time.Instant;
 @Table(name = "user_password_history")
 public class UserPasswordHistory {
     @Id
-    @ColumnDefault("nextval('user_password_history_id_seq')")
     @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotNull

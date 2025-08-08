@@ -18,8 +18,8 @@ import java.time.Instant;
 @Table(name = "seat")
 public class Seat {
     @Id
-    @ColumnDefault("nextval('seat_id_seq')")
     @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotNull

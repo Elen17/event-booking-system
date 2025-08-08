@@ -57,6 +57,8 @@ public class AuthController {
 
         // Add empty login request object for form binding
         if (!model.containsAttribute("loginRequest")) {
+
+
             model.addAttribute("loginRequest", new LoginRequestDto());
         }
 
@@ -72,7 +74,6 @@ public class AuthController {
 
         // Add application configuration
         model.addAttribute("appName", "Ticketo");
-        model.addAttribute("rememberMeEnabled", true);
 
         log.info("Redirecting to login page: auth/login");
         return "auth/login";
@@ -137,10 +138,11 @@ public class AuthController {
         }
 
         try {
-            log.info("Registering new user successfully: {}", userRegistrationDto);
             registrationService.registerUser(userRegistrationDto);
+            log.info("Registering new user successfully: {}", userRegistrationDto);
+
             return "redirect:/auth/login?registered";
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             log.error("Registration failed: {}", e.getMessage());
             redirectAttributes.addFlashAttribute("errorMessage", "Registration failed. Please try again.");
             return "redirect:/auth/register";

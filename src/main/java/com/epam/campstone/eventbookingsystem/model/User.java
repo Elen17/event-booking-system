@@ -17,8 +17,8 @@ import java.util.Set;
 @Table(name = "app_user")
 public class User {
     @Id
-    @ColumnDefault("nextval('app_user_id_seq')")
     @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Size(max = 255)

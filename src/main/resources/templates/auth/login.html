@@ -246,46 +246,32 @@
         </div>
 
         <!-- Display error messages -->
-        <div th:if="${error}" class="error-message" th:text="${error}">
-            Invalid username or password
-        </div>
-
-        <!-- Display success messages -->
-        <div th:if="${message}" class="success-message" th:text="${message}">
-            Registration successful
-        </div>
-
-        <!-- Display logout message -->
-        <div th:if="${param.logout}" class="success-message">
-            You have been logged out successfully
-        </div>
+        <div th:if="${error}" class="error-message" th:text="${error}"></div>
 
         <form th:action="@{/api/auth/login}" method="post" th:object="${loginRequest}">
             <!-- CSRF token for security -->
             <input type="hidden" th:name="${_csrf != null} ? ${_csrf.parameterName} : '_csrf'" th:value="${_csrf != null} ? ${_csrf.token} : ''"/>
 
             <div class="form-group">
-                <label for="username" th:text="#{login.username}">Username</label>
+                <label for="username">Username</label>
                 <input type="text"
                        id="username"
-                       th:field="*{email}"
+                       th:field="*{username}"
                        name="username"
-                       th:placeholder="#{login.username.placeholder}"
-                       th:class="${loginRequest != null and #fields.hasErrors('email')} ? 'field-error' : ''"
+                       th:class="${loginRequest != null and #fields.hasErrors('username')} ? 'field-error' : ''"
                        required>
-                <span th:if="${loginRequest != null and #fields.hasErrors('email')}"
-                      th:errors="*{email}"
-                      class="field-error-message">Username error</span>
+                <span th:if="${loginRequest != null and #fields.hasErrors('username')}"
+                      th:errors="*{username}"
+                      class="field-error-message"></span>
             </div>
 
             <div class="form-group">
-                <label for="password" th:text="#{login.password}">Password</label>
+                <label for="password">Password</label>
                 <div class="input-container">
                     <input type="password"
                            id="password"
                            th:field="*{password}"
                            name="password"
-                           th:placeholder="#{login.password.placeholder}"
                            th:class="${loginRequest != null and #fields.hasErrors('password')} ? 'field-error' : ''"
                            required>
                     <button type="button" class="password-toggle" id="togglePassword">
@@ -296,27 +282,15 @@
                 </div>
                 <span th:if="${loginRequest != null and #fields.hasErrors('password')}"
                       th:errors="*{password}"
-                      class="field-error-message">Password error</span>
+                      class="field-error-message"></span>
             </div>
 
-            <!-- Remember me checkbox -->
-            <div class="form-group" th:if="${rememberMeEnabled}">
-                <label>
-                    <input type="checkbox" name="remember-me" th:text="#{login.rememberme}"> Remember me
-                </label>
-            </div>
-
-            <button type="submit" class="login-btn" id="loginBtn" th:text="#{login.submit}">Login</button>
+            <button type="submit" class="login-btn" id="loginBtn">Login</button>
         </form>
 
         <div class="signup-link">
-            <span th:text="#{login.signup.text}">Don't have an account?</span>
-            <a th:href="@{/register}" th:text="#{login.signup.link}">Sign up</a>
-        </div>
-
-        <!-- Additional links -->
-        <div class="signup-link" style="margin-top: 10px;">
-            <a th:href="@{/forgot-password}" th:text="#{login.forgot.password}">Forgot password?</a>
+            <span>Don't have an account?</span>
+            <a th:href="@{/auth/register}">Sign up</a>
         </div>
     </div>
 </div>

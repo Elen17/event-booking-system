@@ -14,6 +14,7 @@ import com.epam.campstone.eventbookingsystem.service.api.RegistrationService;
 import com.epam.campstone.eventbookingsystem.util.PasswordUtil;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -21,24 +22,28 @@ import java.util.UUID;
 
 @Service
 public class RegistrationServiceImpl implements RegistrationService {
+    private static final String HASH_ALGORITHM = "bcrypt";
 
     private final UserRepository userRepository;
     private final UserRoleRepository userRoleRepository;
     private final CountryRepository countryRepository;
     private final String defaultRoleName;
     private final UserPasswordRepository userPasswordHistoryRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public RegistrationServiceImpl(
             UserRepository userRepository,
             UserRoleRepository userRoleRepository,
             CountryRepository countryRepository,
-            @Value("${app.security.default-role:ROLE_USER}") String defaultRoleName,
-            UserPasswordRepository userPasswordHistoryRepository) {
+            @Value("${app.security.default-role:USER}") String defaultRoleName,
+            UserPasswordRepository userPasswordHistoryRepository,
+            PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.userRoleRepository = userRoleRepository;
         this.countryRepository = countryRepository;
         this.defaultRoleName = defaultRoleName;
         this.userPasswordHistoryRepository = userPasswordHistoryRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -64,13 +69,16 @@ public class RegistrationServiceImpl implements RegistrationService {
         user.setEmail(registrationDto.getEmail());
         user.setRole(userRole);
         user.setCountry(country);
+        user.setCreatedAt(Instant.now());
+        user.setIsActive(true);
 
         // Set the password (this will hash it with a new salt)
         UserPasswordHistory passwordHistory = new UserPasswordHistory();
         String salt = PasswordUtil.generateSalt();
-        passwordHistory.setPasswordHash(PasswordUtil.hashPassword(registrationDto.getPassword(), salt));
+        passwordHistory.setPasswordHash(passwordEncoder.encode(registrationDto.getPassword()));
         passwordHistory.setSalt(salt);
         passwordHistory.setCreatedAt(Instant.now());
+        passwordHistory.setHashAlgorithm(HASH_ALGORITHM);
         passwordHistory.setUser(user);
 
         userRepository.save(user);

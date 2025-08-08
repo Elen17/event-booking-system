@@ -45,9 +45,9 @@ public class LoginServiceImpl implements LoginService {
     public JwtResponseDto authenticateUser(LoginRequestDto loginRequest) {
         try {
             // Authenticate user
-            log.info("Authenticating user: {}", loginRequest.getEmail());
+            log.info("Authenticating user: {}", loginRequest.getUsername());
             Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
+                    new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
 

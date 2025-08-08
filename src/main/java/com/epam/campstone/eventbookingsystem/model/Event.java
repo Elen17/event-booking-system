@@ -16,8 +16,8 @@ import java.time.LocalTime;
 @Table(name = "event")
 public class Event {
     @Id
-    @ColumnDefault("nextval('event_id_seq')")
     @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Size(max = 255)
