@@ -50,18 +50,18 @@ VALUES ('PLANNED'),
 CREATE TABLE IF NOT EXISTS event_type
 (
     id   SERIAL PRIMARY KEY,
-    name VARCHAR(255) NOT NULL UNIQUE
+    name VARCHAR(255) NOT NULL UNIQUE,
+    display_name VARCHAR(255) NOT NULL
 );
 
 -- Clear and populate event_type
-INSERT INTO event_type (name)
-VALUES ('Concert'),
-       ('Sport'),
-       ('Festival'),
-       ('Cinema'),
-       ('Theater'),
-       ('Sports'),
-       ('Opera and Ballet');
+INSERT INTO event_type (name, display_name)
+VALUES ('CONCERT', '🎵 Concert'),
+       ('SPORTS', '⚽ Sports'),
+       ('FESTIVAL', '🎉 Festival'),
+       ('CINEMA', '🎞 Cinema'),
+       ('THEATER', '🎭 Theater'),
+       ('OPERA_AND_BALLET', '🎭 Opera and Ballet'),;
 
 CREATE TABLE IF NOT EXISTS seat_status
 (

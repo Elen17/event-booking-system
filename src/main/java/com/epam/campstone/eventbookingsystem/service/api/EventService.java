@@ -1,10 +1,15 @@
 package com.epam.campstone.eventbookingsystem.service.api;
 
+import com.epam.campstone.eventbookingsystem.controller.HomeController;
+import com.epam.campstone.eventbookingsystem.dto.CategoryOptionDto;
 import com.epam.campstone.eventbookingsystem.dto.EventDto;
+import com.epam.campstone.eventbookingsystem.dto.EventSearchDto;
 import com.epam.campstone.eventbookingsystem.model.Event;
+import com.epam.campstone.eventbookingsystem.model.EventType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface EventService {
@@ -62,4 +67,10 @@ public interface EventService {
      * @param count   number of spots to increase
      */
     void increaseAvailableSpots(Long eventId, int count);
+
+    List<Event> getFeaturedEvents(int i);
+
+    Page<Event> searchEvents(EventSearchDto searchParams, Pageable pageable);
+
+    List<CategoryOptionDto> getCategoryOptions();
 }

@@ -79,6 +79,15 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     List<Event> findByEventDateAfter(@Param("date") LocalDate date);
 
     /**
+     * Find events after a specific date with pagination.
+     *
+     * @param date     the date to find events after
+     * @param pageable pagination and sorting information
+     * @return a page of events after the given date
+     */
+    List<Event> findByEventDateAfter(@Param("date") LocalDate date, Pageable pageable);
+
+    /**
      * Find events before a specific date.
      *
      * @param date the date to find events before
@@ -124,8 +133,8 @@ public interface EventRepository extends JpaRepository<Event, Long> {
      * @return a list of upcoming events
      */
     @Query("SELECT e FROM Event e WHERE e.status.name = 'PLANNED' AND e.eventDate >= CURRENT_DATE " +
-            "ORDER BY e.eventDate, e.startTime")
-    List<Event> findUpcomingEvents();
+            "ORDER BY e.eventDate, e.startTime LIMIT pageable.pageSize")
+    List<Event> findUpcomingEvents(Pageable pageable);
     /**
      * Update the status of an event.
      *
@@ -137,4 +146,20 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     @Transactional
     @Query("UPDATE Event e SET e.status = :status WHERE e.id = :eventId")
     int updateStatus(Long eventId, EventStatus status);
+
+    /**
+     * Search events by start date, event type, and city.
+     *
+     * @param startDate the start date
+     * @param eventType the event type
+     * @param city      the city
+     * @param pageable  pagination and sorting information
+     * @return a page of events matching the search criteria
+     */
+    @Query("SELECT e FROM Event e WHERE e.eventDate >= :startDate " +
+            "AND e.type.name = :eventType " +
+            "AND e.venue.city.name = :city " +
+            "ORDER BY e.eventDate, e.startTime " +
+            "OFFSET ((pageable.pageNumber - 1) * pageable.pageSize)")
+    Page<Event> searchEvents(LocalDate startDate, String eventType, String city, Pageable pageable);
 }

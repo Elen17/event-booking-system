@@ -20,5 +20,7 @@ public class EventType {
             unique = true, length = 50)
     private String name;
 
+    @Column(name = "display_name", nullable = false)
+    private String displayName;
 
 }
