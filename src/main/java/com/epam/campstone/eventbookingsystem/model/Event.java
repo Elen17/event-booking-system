@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -59,5 +60,9 @@ public class Event {
     @ColumnDefault("0")
     @Column(name = "available_attendees_capacity", nullable = false)
     private Integer availableAttendeesCapacity;
+
+    @NotNull
+    @Column(name = "min_price", nullable = false)
+    private BigDecimal minPrice;
 
 }

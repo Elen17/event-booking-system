@@ -57,7 +57,7 @@ public class HomeController {
         List<Event> featuredEvents = eventService.getFeaturedEvents(5);
         model.addAttribute("featuredEvents", featuredEvents);
 
-        return "home/index"; // This will render the Thymeleaf template
+        return "/home"; // This will render the Thymeleaf template
     }
 
     @GetMapping("/home")
@@ -90,7 +90,7 @@ public class HomeController {
         model.addAttribute("featuredTitle", "Recommended for You");
 
         log.info("User {} accessing dashboard", user.getEmail());
-        return "home/index"; // Same template, different data
+        return "home/dashboard"; // Same template, different data
     }
 
 

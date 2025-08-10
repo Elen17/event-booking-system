@@ -36,10 +36,7 @@ public class UserController {
 
         if (!model.containsAttribute("userProfile")) {
             log.info("Adding user profile to model");
-            UserProfileDto userProfile = new UserProfileDto();
-            userProfile.setFirstName(user.getFirstName());
-            userProfile.setLastName(user.getLastName());
-            userProfile.setEmail(user.getEmail());
+            UserProfileDto userProfile = mapUserProfileDto(user);
             model.addAttribute("userProfile", userProfile);
         }
 
@@ -47,23 +44,20 @@ public class UserController {
     }
 
     @PostMapping("/profile")
-    public String updateProfile(
-            @Valid @ModelAttribute("userProfile") UserProfileDto userProfile,
-            BindingResult bindingResult,
-            @AuthenticationPrincipal UserDetails currentUser,
-            RedirectAttributes redirectAttributes) {
+    public String updateProfile(@Valid @ModelAttribute UserProfileDto userProfile,
+                                BindingResult result, Model model,
+                                RedirectAttributes redirectAttributes) {
+        log.info("Updating profile for user: {}", userProfile.getEmail());
 
-        log.info("Updating profile for user: {}", currentUser.getUsername());
-
-        if (bindingResult.hasErrors()) {
-            log.info("Validation errors during profile update: {}", bindingResult.getAllErrors());
-            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.userProfile", bindingResult);
+        if (result.hasErrors()) {
+            log.info("Validation errors during profile update: {}", result.getAllErrors());
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.userProfile", result);
             redirectAttributes.addFlashAttribute("userProfile", userProfile);
             return "redirect:/user/profile";
         }
 
         try {
-            userService.updateUserProfile(currentUser.getUsername(), userProfile);
+            userService.updateUserProfile(userProfile.getEmail(), userProfile);
             redirectAttributes.addFlashAttribute("successMessage", "Profile updated successfully!");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Error updating profile: " + e.getMessage());
@@ -105,5 +99,13 @@ public class UserController {
     public String getUserBookings(@AuthenticationPrincipal UserDetails currentUser, Model model) {
         model.addAttribute("bookings", bookingService.findUserBookings(currentUser.getUsername()));
         return "user/bookings";
+    }
+
+    private static UserProfileDto mapUserProfileDto(User user) {
+        UserProfileDto userProfile = new UserProfileDto();
+        userProfile.setFirstName(user.getFirstName());
+        userProfile.setLastName(user.getLastName());
+        userProfile.setEmail(user.getEmail());
+        return userProfile;
     }
 }

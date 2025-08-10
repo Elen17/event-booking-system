@@ -408,14 +408,15 @@
         <nav class="nav">
             <div class="logo">🎫 Ticketo</div>
             <ul class="nav-links">
-                <li><a th:href="@{/}">Home</a></li>
-                <li th:if="${user != null}"><a th:href="@{/bookings}">My Bookings</a></li>
-                <li th:if="${user != null}"><a th:href="@{/profile}">My Profile</a></li>
+                <li><a th:href="@{/dashboard}">Home</a></li>
+                <li th:if="${user != null}"><a th:href="@{/user/bookings}">My Bookings</a></li>
+                <li th:if="${user != null}"><a th:href="@{/user/profile}">My Profile</a></li>
             </ul>
             <div class="user-section">
                 <!-- Show user greeting and logout if authenticated -->
                 <div th:if="${user != null}">
-                    <span class="user-greeting">Welcome, <span th:text="${user.name}">User</span>!</span>
+                    <span class="user-greeting">Welcome, <span
+                            th:text="${user.firstName} + ' ' + ${user.lastName}">User</span>!</span>
                     <form th:action="@{/logout}" method="post" style="display: inline;">
                         <button type="submit" class="btn btn-primary">Log Out</button>
                     </form>
@@ -435,12 +436,13 @@
             <div class="search-grid">
                 <div class="form-group">
                     <label for="location">📍 Location</label>
-                    <select id="location" name="location" th:value="${searchParams?.location}">
+                    <select id="location" name="location" th:value="${searchParams?.city}">
                         <option value="">Select City</option>
                         <option th:each="city : ${cities}"
                                 th:value="${city}"
                                 th:text="${city}"
-                                th:selected="${city == searchParams?.location}">City</option>
+                                th:selected="${city == searchParams?.city}">City
+                        </option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -454,7 +456,8 @@
                         <option th:each="category : ${categories}"
                                 th:value="${category.value}"
                                 th:text="${category.displayName}"
-                                th:selected="${category.value == searchParams?.category}">Category</option>
+                                th:selected="${category.value == searchParams?.category}">Category
+                        </option>
                     </select>
                 </div>
                 <button type="submit" class="btn btn-primary">Search Events</button>
@@ -463,31 +466,39 @@
 
         <!-- Search Results -->
         <div id="search-results" class="search-results" th:classappend="${searchResults != null} ? 'active'">
-            <h3 th:if="${searchResults != null and !searchResults.empty}"
+            <h3 th:if="${searchResults != null and !searchResults.isEmpty()}"
                 class="section-title"
-                th:text="'Search Results (' + ${searchResults.size()} + ' events found)'">Search Results</h3>
+                th:text="'Search Results (' + ${searchResults.size()} + ' events found)'">Search
+                Results</h3>
 
-            <div th:if="${searchResults != null and searchResults.empty}" class="no-results">
+            <div th:if="${searchResults != null and searchResults.isEmpty()}" class="no-results">
                 No events found matching your criteria. Please try different search parameters.
             </div>
 
-            <div th:if="${searchResults != null and !searchResults.empty}" class="events-grid">
-                <div th:each="event : ${searchResults}" class="event-card" th:onclick="'openEventModal(\'' + ${event.id} + '\')'">
-                    <div class="event-image" th:text="${event.categoryIcon + ' ' + event.categoryName}">🎵 Event</div>
+            <div th:if="${searchResults != null and !searchResults.isEmpty()}" class="events-grid">
+                <div th:each="event : ${searchResults}" class="event-card"
+                     th:onclick="'openEventModal(\'' + ${event.id} + '\')'">
+                    <div class="event-image" th:text="${event.type.displayName}">🎵 Event</div>
                     <div class="event-content">
                         <h3 class="event-title" th:text="${event.title}">Event Title</h3>
                         <div class="event-details">
                             <div class="event-detail">
                                 <span>📅</span>
-                                <span th:text="${#temporals.format(event.dateTime, 'MMMM dd, yyyy - HH:mm')}">Date and Time</span>
-                            </div>
+                                <span th:with="eventDateTime=${#temporals.createDate(
+    event.eventDate.year,
+    event.eventDate.monthValue,
+    event.eventDate.dayOfMonth,
+    event.startTime.hour,
+    event.startTime.minute
+)}"
+                                      th:text="${#temporals.format(eventDateTime, 'MMMM dd, yyyy - HH:mm')}">Date and Time</span>                            </div>
                             <div class="event-detail">
                                 <span>📍</span>
-                                <span th:text="${event.venue + ', ' + event.location}">Venue, Location</span>
+                                <span th:text="${event.venue + ', ' + event.venue.name}">Venue, Location</span>
                             </div>
-                            <div class="event-detail" th:if="${event.duration}">
+                            <div class="event-detail" th:if="${event.getEndTime() != null}">
                                 <span>⏰</span>
-                                <span th:text="'Duration: ' + ${event.duration}">Duration</span>
+                                <span th:text="'Duration: ' + ${event.getStartTime().until(event.getEndTime(), ChronoUnit.HOURS)}">Duration</span>
                             </div>
                         </div>
                         <div class="event-price" th:text="'From $' + ${event.minPrice}">From $0</div>
@@ -505,22 +516,22 @@
             <div th:each="event : ${featuredEvents}"
                  class="event-card"
                  th:onclick="'openEventModal(\'' + ${event.id} + '\')'"
-                 th:if="${event.featured}">
-                <div class="event-image" th:text="${event.categoryIcon + ' ' + event.categoryName}">🎵 Event</div>
+                 th:if="${event.getEventDate().isAfter(LocalDateTime.now())}">
+                <div class="event-image" th:text="${event.type.displayName}">🎵 Event</div>
                 <div class="event-content">
                     <h3 class="event-title" th:text="${event.title}">Event Title</h3>
                     <div class="event-details">
                         <div class="event-detail">
                             <span>📅</span>
-                            <span th:text="${#temporals.format(event.dateTime, 'MMMM dd, yyyy - HH:mm')}">Date and Time</span>
+                            <span th:text="${#temporals.format(LocalDateTime.of(event.eventDate, event.startTime), 'MMMM dd, yyyy - HH:mm')}">Date and Time</span>
                         </div>
                         <div class="event-detail">
                             <span>📍</span>
-                            <span th:text="${event.venue + ', ' + event.location}">Venue, Location</span>
+                            <span th:text="${event.venue + ', ' + event.venue.name}">Venue, Location</span>
                         </div>
-                        <div class="event-detail" th:if="${event.duration}">
+                        <div class="event-detail" th:if="${event.getEndTime() != null}">
                             <span>⏰</span>
-                            <span th:text="'Duration: ' + ${event.duration}">Duration</span>
+                            <span th:text="'Duration: ' + ${event.getStartTime().until(event.getEndTime(), ChronoUnit.HOURS)}">Duration</span>
                         </div>
                     </div>
                     <div class="event-price" th:text="'From $' + ${event.minPrice}">From $0</div>
@@ -530,7 +541,7 @@
         </div>
 
         <!-- Show message if no featured events -->
-        <div th:if="${featuredEvents == null or featuredEvents.empty}" class="no-results">
+        <div th:if="${featuredEvents == null or featuredEvents.isEmpty()}" class="no-results">
             <p>No featured events available at the moment. Check back later!</p>
         </div>
     </section>

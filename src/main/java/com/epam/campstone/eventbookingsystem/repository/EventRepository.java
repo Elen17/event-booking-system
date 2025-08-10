@@ -133,7 +133,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
      * @return a list of upcoming events
      */
     @Query("SELECT e FROM Event e WHERE e.status.name = 'PLANNED' AND e.eventDate >= CURRENT_DATE " +
-            "ORDER BY e.eventDate, e.startTime LIMIT pageable.pageSize")
+            "ORDER BY e.eventDate, e.startTime")
     List<Event> findUpcomingEvents(Pageable pageable);
     /**
      * Update the status of an event.
@@ -159,7 +159,6 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     @Query("SELECT e FROM Event e WHERE e.eventDate >= :startDate " +
             "AND e.type.name = :eventType " +
             "AND e.venue.city.name = :city " +
-            "ORDER BY e.eventDate, e.startTime " +
-            "OFFSET ((pageable.pageNumber - 1) * pageable.pageSize)")
+            "ORDER BY e.eventDate, e.startTime")
     Page<Event> searchEvents(LocalDate startDate, String eventType, String city, Pageable pageable);
 }

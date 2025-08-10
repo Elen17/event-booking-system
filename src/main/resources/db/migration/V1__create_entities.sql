@@ -61,7 +61,7 @@ VALUES ('CONCERT', '🎵 Concert'),
        ('FESTIVAL', '🎉 Festival'),
        ('CINEMA', '🎞 Cinema'),
        ('THEATER', '🎭 Theater'),
-       ('OPERA_AND_BALLET', '🎭 Opera and Ballet'),;
+       ('OPERA_AND_BALLET', '🎭 Opera and Ballet');
 
 CREATE TABLE IF NOT EXISTS seat_status
 (

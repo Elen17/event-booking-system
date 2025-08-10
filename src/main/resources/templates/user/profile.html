@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<!-- saved from url=(0080)file:///C:/Users/elen.khachatryan/epam/capstone%20files/final_profile_page.html# -->
-<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Profile - EventHub</title>
     <style>
@@ -230,58 +230,23 @@
             display: none !important;
         }
 
-        @media (max-width: 768px) {
-
-            .profile-header {
-                flex-direction: column;
-                gap: 20px;
-                text-align: center;
-            }
-
-            .form-actions {
-                flex-direction: column;
-            }
+        .alert {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            font-weight: 600;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        .alert-success {
+            background: rgba(34, 197, 94, 0.2);
+            border: 1px solid rgba(34, 197, 94, 0.4);
+            color: #4ade80;
         }
 
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            min-height: 100vh;
-            color: #e2e8f0;
-        }
-
-        /* Custom background overlay for ticket texture */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        @keyframes float {
-            0% {
-                transform: translateY(100vh) rotate(0deg);
-                opacity: 0;
-            }
-            10% {
-                opacity: 0.2;
-            }
-            90% {
-                opacity: 0.2;
-            }
-            100% {
-                transform: translateY(-100px) rotate(360deg);
-                opacity: 0;
-            }
+        .alert-error {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            color: #f87171;
         }
 
         header {
@@ -344,64 +309,15 @@
             width: 100%;
         }
 
-        .btn {
-            padding: 14px 28px;
-            border: none;
-            border-radius: 12px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 16px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.5s;
-        }
-
-        .btn:hover::before {
-            left: 100%;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #d4af37, #b8860b);
-            color: #1a1a2e;
-            box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
-            font-weight: 800;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.6);
-        }
-
-        .btn-secondary {
-            background: rgba(30, 35, 55, 0.8);
-            color: #cbd5e1;
-            border: 2px solid rgba(139, 69, 19, 0.5);
-            backdrop-filter: blur(10px);
-        }
-
-        .btn-secondary:hover {
-            background: rgba(40, 45, 65, 0.9);
-            border-color: #d4af37;
-            color: #d4af37;
-            transform: translateY(-2px);
-        }
-
         @media (max-width: 768px) {
-            .hero h1 {
-                font-size: 2.8rem;
+            .profile-header {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+
+            .form-actions {
+                flex-direction: column;
             }
 
             .nav-links {
@@ -417,90 +333,128 @@
         <nav class="nav">
             <div class="logo">🎫 Ticketo</div>
             <ul class="nav-links">
-                <li><a href="file:///C:/Users/elen.khachatryan/epam/capstone%20files/final_event_booking_home.html#">Home</a>
-                </li>
-                <li>
-                    <a href="file:///C:/Users/elen.khachatryan/epam/capstone%20files/final_booking_page.html#">
-                        My Bookings
-                    </a>
-                </li>
-                <li>
-                    <a href="file:///C:/Users/elen.khachatryan/epam/capstone%20files/final_profile_page.html#">
-                        My Profile
-                    </a>
-                </li>
+                <li><a th:href="@{/}">Home</a></li>
+                <li><a th:href="@{/bookings}">My Bookings</a></li>
+                <li><a th:href="@{/templates/user}" class="active">My Profile</a></li>
             </ul>
             <div class="user-section">
-                <a href="file:///C:/Users/elen.khachatryan/epam/capstone%20files/final_event_booking_home.html#" class="btn btn-primary">Log Out</a>
+                <form th:action="@{/logout}" method="post" style="display: inline;">
+                    <button type="submit" class="btn btn-primary">Log Out</button>
+                </form>
             </div>
         </nav>
     </header>
 
     <div class="profile-card">
+        <!-- Success/Error Messages -->
+        <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+        <div th:if="${errorMessage}" class="alert alert-error" th:text="${errorMessage}"></div>
+        <div th:if="${#fields.hasAnyErrors()}" class="alert alert-error">
+            <ul style="margin: 0; padding-left: 20px;">
+                <li th:each="error : ${#fields.allErrors()}" th:text="${error}"></li>
+            </ul>
+        </div>
+
         <div class="profile-header">
             <div class="profile-info">
                 <div class="avatar">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><!--!Font Awesome Free v7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M463 448.2C440.9 409.8 399.4 384 352 384L288 384C240.6 384 199.1 409.8 177 448.2C212.2 487.4 263.2 512 320 512C376.8 512 427.8 487.3 463 448.2zM64 320C64 178.6 178.6 64 320 64C461.4 64 576 178.6 576 320C576 461.4 461.4 576 320 576C178.6 576 64 461.4 64 320zM320 336C359.8 336 392 303.8 392 264C392 224.2 359.8 192 320 192C280.2 192 248 224.2 248 264C248 303.8 280.2 336 320 336z"></path></svg>
+                    <span th:text="${user.firstName != null and user.firstName.length() > 0} ? ${user.firstName.substring(0,1).toUpperCase()} : 'U'">J</span>
                 </div>
                 <div class="user-details">
-                    <h2 id="display-name">John Doe</h2>
-                    <p class="username">@<span id="display-username">john_doe123</span></p>
+                    <h2 id="display-name" th:text="${user.firstName + ' ' + user.lastName}">John Doe</h2>
+                    <p class="username">@<span id="display-username" th:text="${user.username}">john_doe123</span></p>
                 </div>
             </div>
             <button class="edit-btn" id="edit-btn" onclick="toggleEdit()">Edit</button>
         </div>
 
-        <div id="profile-form">
+        <!-- Profile Form -->
+        <form th:action="@{/templates/user}" th:object="${user}" method="post" id="profile-form">
             <div class="form-group">
                 <label class="form-label">Username</label>
-                <div id="username-display" class="form-value">john_doe123</div>
-                <input type="text" id="username-input" class="form-input hidden" value="john_doe123">
+                <div id="username-display" class="form-value" th:text="*{username}">john_doe123</div>
+                <input type="text" th:field="*{username}" id="username-input" class="form-input hidden">
             </div>
 
             <div class="form-group">
                 <label class="form-label">Password</label>
-                <div id="password-display" class="form-value">""""""""""</div>
+                <div id="password-display" class="form-value">••••••••••</div>
                 <div id="password-input-group" class="password-group hidden">
-                    <input type="password" id="password-input" class="form-input" value="mypassword123">
-                    <button type="button" class="password-toggle" onclick="togglePassword()">=A</button>
+                    <input type="password" th:field="*{password}" id="password-input" class="form-input" placeholder="Enter new password">
+                    <button type="button" class="password-toggle" onclick="togglePassword()">👁</button>
                 </div>
             </div>
 
             <div class="form-group">
                 <label class="form-label">First Name</label>
-                <div id="firstname-display" class="form-value">John</div>
-                <input type="text" id="firstname-input" class="form-input hidden" value="John">
+                <div id="firstname-display" class="form-value" th:text="*{firstName}">John</div>
+                <input type="text" th:field="*{firstName}" id="firstname-input" class="form-input hidden">
             </div>
 
             <div class="form-group">
                 <label class="form-label">Last Name</label>
-                <div id="lastname-display" class="form-value">Doe</div>
-                <input type="text" id="lastname-input" class="form-input hidden" value="Doe">
+                <div id="lastname-display" class="form-value" th:text="*{lastName}">Doe</div>
+                <input type="text" th:field="*{lastName}" id="lastname-input" class="form-input hidden">
             </div>
 
             <div class="form-group">
                 <label class="form-label">Email</label>
                 <div id="email-display" class="email-display">
-                    <div class="email-icon" style=""><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><!--!Font Awesome Free v7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M64 176C64 149.5 85.5 128 112 128L528 128C554.5 128 576 149.5 576 176L576 257.4C551.6 246.2 524.6 240 496 240C408.3 240 334.3 298.8 311.3 379.2C304.2 377.9 297.2 375 291.2 370.4L83.2 214.4C71.1 205.3 64 191.1 64 176zM304 432C304 460.6 310.2 487.6 321.4 512L128 512C92.7 512 64 483.3 64 448L64 260L262.4 408.8C275 418.2 289.3 424.2 304.1 426.7C304.1 428.5 304 430.2 304 432zM352 432C352 352.5 416.5 288 496 288C575.5 288 640 352.5 640 432C640 511.5 575.5 576 496 576C416.5 576 352 511.5 352 432zM553.4 371.1C546.3 365.9 536.2 367.5 531 374.6L478 447.5L451.2 420.7C445 414.5 434.8 414.5 428.6 420.7C422.4 426.9 422.4 437.1 428.6 443.3L468.6 483.3C471.9 486.6 476.5 488.3 481.2 487.9C485.9 487.5 490.1 485.1 492.9 481.4L556.9 393.4C562.1 386.3 560.5 376.2 553.4 371.1z"></path></svg></div>
-                    <span class="form-value">john.doe@email.com</span>
+                    <div class="email-icon">📧</div>
+                    <span class="form-value" th:text="*{email}">john.doe@email.com</span>
                 </div>
-                <input type="email" id="email-input" class="form-input hidden" value="john.doe@email.com">
+                <input type="email" th:field="*{email}" id="email-input" class="form-input hidden">
             </div>
 
+            <!-- Additional User Information (if available) -->
+            <div class="form-group" th:if="${user.phoneNumber}">
+                <label class="form-label">Phone Number</label>
+                <div id="phone-display" class="form-value" th:text="*{phoneNumber}">+1234567890</div>
+                <input type="tel" th:field="*{phoneNumber}" id="phone-input" class="form-input hidden">
+            </div>
+
+            <div class="form-group" th:if="${user.dateOfBirth}">
+                <label class="form-label">Date of Birth</label>
+                <div id="dob-display" class="form-value" th:text="${#temporals.format(user.dateOfBirth, 'MMM dd, yyyy')}">Jan 01, 1990</div>
+                <input type="date" th:field="*{dateOfBirth}" id="dob-input" class="form-input hidden">
+            </div>
+
+            <div class="form-group" th:if="${user.address}">
+                <label class="form-label">Address</label>
+                <div id="address-display" class="form-value" th:text="*{address}">123 Main St, City, Country</div>
+                <textarea th:field="*{address}" id="address-input" class="form-input hidden" rows="3"></textarea>
+            </div>
+
+            <!-- Account Information -->
+            <div class="form-group" th:if="${user.createdAt}">
+                <label class="form-label">Member Since</label>
+                <div class="form-value" th:text="${#temporals.format(user.createdAt, 'MMM dd, yyyy')}">Jan 01, 2023</div>
+            </div>
+
+            <div class="form-group" th:if="${user.lastLoginAt}">
+                <label class="form-label">Last Login</label>
+                <div class="form-value" th:text="${#temporals.format(user.lastLoginAt, 'MMM dd, yyyy \'at\' HH:mm')}">Dec 25, 2024 at 15:30</div>
+            </div>
+
+            <!-- Hidden field for user ID -->
+            <input type="hidden" th:field="*{id}">
+
             <div id="form-actions" class="form-actions hidden">
-                <button class="btn btn-primary" onclick="saveProfile()">
-                    =� Save Changes
+                <button type="submit" class="btn btn-primary">
+                    💾 Save Changes
                 </button>
-                <button class="btn btn-secondary" onclick="cancelEdit()">
-                    L
+                <button type="button" class="btn btn-secondary" onclick="cancelEdit()">
+                    ✖ Cancel
                 </button>
             </div>
-        </div>
+        </form>
     </div>
 </div>
 
-<script>
+<script th:inline="javascript">
+    /*<![CDATA[*/
     let isEditing = false;
+    const user = /*[[${user}]]*/ {};
 
     function toggleEdit() {
         isEditing = true;
@@ -520,6 +474,28 @@
         document.getElementById('lastname-input').classList.remove('hidden');
         document.getElementById('email-input').classList.remove('hidden');
         document.getElementById('form-actions').classList.remove('hidden');
+
+        // Show optional fields if they exist
+        const phoneDisplay = document.getElementById('phone-display');
+        const phoneInput = document.getElementById('phone-input');
+        if (phoneDisplay && phoneInput) {
+            phoneDisplay.classList.add('hidden');
+            phoneInput.classList.remove('hidden');
+        }
+
+        const dobDisplay = document.getElementById('dob-display');
+        const dobInput = document.getElementById('dob-input');
+        if (dobDisplay && dobInput) {
+            dobDisplay.classList.add('hidden');
+            dobInput.classList.remove('hidden');
+        }
+
+        const addressDisplay = document.getElementById('address-display');
+        const addressInput = document.getElementById('address-input');
+        if (addressDisplay && addressInput) {
+            addressDisplay.classList.add('hidden');
+            addressInput.classList.remove('hidden');
+        }
     }
 
     function cancelEdit() {
@@ -541,33 +517,30 @@
         document.getElementById('email-input').classList.add('hidden');
         document.getElementById('form-actions').classList.add('hidden');
 
-        // Reset input values
-        document.getElementById('username-input').value = document.getElementById('username-display').textContent;
-        document.getElementById('firstname-input').value = document.getElementById('firstname-display').textContent;
-        document.getElementById('lastname-input').value = document.getElementById('lastname-display').textContent;
-        document.getElementById('email-input').value = document.querySelector('#email-display .form-value').textContent;
-    }
+        // Hide optional fields if they exist
+        const phoneDisplay = document.getElementById('phone-display');
+        const phoneInput = document.getElementById('phone-input');
+        if (phoneDisplay && phoneInput) {
+            phoneDisplay.classList.remove('hidden');
+            phoneInput.classList.add('hidden');
+        }
 
-    function saveProfile() {
-        // Get new values
-        const username = document.getElementById('username-input').value;
-        const firstname = document.getElementById('firstname-input').value;
-        const lastname = document.getElementById('lastname-input').value;
-        const email = document.getElementById('email-input').value;
+        const dobDisplay = document.getElementById('dob-display');
+        const dobInput = document.getElementById('dob-input');
+        if (dobDisplay && dobInput) {
+            dobDisplay.classList.remove('hidden');
+            dobInput.classList.add('hidden');
+        }
 
-        // Update display values
-        document.getElementById('username-display').textContent = username;
-        document.getElementById('display-username').textContent = username;
-        document.getElementById('firstname-display').textContent = firstname;
-        document.getElementById('lastname-display').textContent = lastname;
-        document.querySelector('#email-display .form-value').textContent = email;
-        document.getElementById('display-name').textContent = firstname + ' ' + lastname;
+        const addressDisplay = document.getElementById('address-display');
+        const addressInput = document.getElementById('address-input');
+        if (addressDisplay && addressInput) {
+            addressDisplay.classList.remove('hidden');
+            addressInput.classList.add('hidden');
+        }
 
-        // Exit edit mode
-        cancelEdit();
-
-        // Show success message (optional)
-        alert('Profile updated successfully!');
+        // Reset form to original values
+        document.getElementById('profile-form').reset();
     }
 
     function togglePassword() {
@@ -576,12 +549,22 @@
 
         if (passwordInput.type === 'password') {
             passwordInput.type = 'text';
-            toggleBtn.textContent = '=H';
+            toggleBtn.textContent = '🙈';
         } else {
             passwordInput.type = 'password';
-            toggleBtn.textContent = '=A';
+            toggleBtn.textContent = '👁';
         }
     }
+
+    // Show edit mode if there are validation errors
+    document.addEventListener('DOMContentLoaded', function() {
+        const hasErrors = /*[[${#fields.hasAnyErrors()}]]*/ false;
+        if (hasErrors) {
+            toggleEdit();
+        }
+    });
+    /*]]>*/
 </script>
 
-</body></html>
+</body>
+</html>

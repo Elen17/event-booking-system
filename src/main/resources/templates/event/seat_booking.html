@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Book Event - EventHub</title>
+    <title th:text="'Book Event - ' + ${event.name}">Book Event - EventHub</title>
     <style>
         * {
             margin: 0;
@@ -19,7 +19,6 @@
             color: #e2e8f0;
         }
 
-        /* Background overlay for ticket texture */
         body::before {
             content: '';
             position: fixed;
@@ -164,7 +163,6 @@
 
         .seating-grid {
             display: grid;
-            grid-template-columns: repeat(12, 1fr);
             gap: 8px;
             max-width: 600px;
             margin: 0 auto;
@@ -176,6 +174,47 @@
 
         .premium-area .seating-grid {
             grid-template-columns: repeat(10, 1fr);
+        }
+
+        .regular-area .seating-grid {
+            grid-template-columns: repeat(12, 1fr);
+        }
+
+        .seat {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .seat.available {
+            background: linear-gradient(135deg, #059669, #047857);
+            color: white;
+            box-shadow: 0 4px 15px rgba(5, 150, 105, 0.3);
+        }
+
+        .seat.selected {
+            background: linear-gradient(135deg, #d4af37, #b8860b);
+            color: #1a1a2e;
+            transform: scale(1.15);
+            box-shadow: 0 6px 20px rgba(212, 175, 55, 0.5);
+        }
+
+        .seat.occupied {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            color: white;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .seat.available:hover {
+            background: linear-gradient(135deg, #047857, #065f46);
+            transform: scale(1.05);
         }
 
         .legend {
@@ -365,153 +404,7 @@
             padding: 30px;
         }
 
-        @media (max-width: 1200px) {
-            .booking-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .booking-panel {
-                position: static;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .seating-grid {
-                grid-template-columns: repeat(8, 1fr);
-            }
-
-            .vip-area .seating-grid {
-                grid-template-columns: repeat(6, 1fr);
-            }
-
-            .premium-area .seating-grid {
-                grid-template-columns: repeat(8, 1fr);
-            }
-
-            .legend {
-                gap: 15px;
-            }
-        }
-
-        /* Booking success modal */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.9);
-            z-index: 1000;
-            backdrop-filter: blur(10px);
-        }
-
-        .modal-content {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(15, 20, 35, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: 30px;
-            padding: 50px;
-            max-width: 500px;
-            width: 90%;
-            text-align: center;
-            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8);
-            border: 1px solid rgba(139, 69, 19, 0.3);
-            color: #e2e8f0;
-        }
-
-        .success-icon {
-            font-size: 4rem;
-            color: #059669;
-            margin-bottom: 20px;
-        }
-
-        .modal h2 {
-            font-size: 2rem;
-            font-weight: 800;
-            color: #e2e8f0;
-            margin-bottom: 15px;
-        }
-
-        .modal p {
-            color: #94a3b8;
-            margin-bottom: 30px;
-            line-length: 1.6;
-        }
-
-        .modal-btn {
-            padding: 15px 30px;
-            background: linear-gradient(135deg, #d4af37, #b8860b);
-            border: none;
-            border-radius: 12px;
-            color: #1a1a2e;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .modal-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(212, 175, 55, 0.4);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(rgba(15, 15, 25, 0.85), rgba(25, 25, 40, 0.8)),
-            url('data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAyAGQDASIAAhEBAxEB/8QAHAAAAgIDAQEAAAAAAAAAAAAAAAgABwYJCgsB/8QAOhAAAQMCBAQEAwcDBQEAAAAAAQIDEQAEBQYSITETQVFhBweBkSJxoQgyscHR4fAUFUJSkrLxFmKC/8QAFwEAAwEAAAAAAAAAAAAAAAAAAAECA//EABoRAQEBAQEBAQAAAAAAAAAAAAEAAgMREzH/2gAMAwEAAhEDEQA/AJqSlKUOI5UKKVCtKVTW81zzaWgtpKVJ1QCCoAK4MRqIEH7w3HXcU8eUfajxyxgsHjOGeIVbtvLZdSlZp2I1O9D3E2/1x7msR5h5I8Xs88LWGi8dGm5t3QGbbVxgqSrSjT8IkAkkAblPG0qlYJj+LYvgVxd4Rg+sZkN6vRJCkEfCeojkSI6bTUOpSlCilKUKKUpQopSlCilKUKKUvJPhvmzF8rvL7JO5cJN2XUkJSpTaS2koK2o0OeJvMGClSkFSe4PbxTy7z9lrPuY7u3u8JZddw4sNNFg3bZSEFxRSklR4a/Dk6k/V7eIbKVCKUpQ4r//Z') center/cover fixed;
-            min-height: 100vh;
-            color: #e2e8f0;
-        }
-
-        /* Custom background overlay for ticket texture */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at 20% 30%, rgba(139, 69, 19, 0.1) 0%, transparent 50%),
-            radial-gradient(circle at 80% 70%, rgba(160, 82, 45, 0.1) 0%, transparent 50%),
-            repeating-linear-gradient(45deg, rgba(139, 69, 19, 0.02) 0px, transparent 2px, transparent 4px, rgba(139, 69, 19, 0.02) 6px);
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            position: relative;
-            z-index: 2;
-        }
-
-        @keyframes float {
-            0% {
-                transform: translateY(100vh) rotate(0deg);
-                opacity: 0;
-            }
-            10% {
-                opacity: 0.2;
-            }
-            90% {
-                opacity: 0.2;
-            }
-            100% {
-                transform: translateY(-100px) rotate(360deg);
-                opacity: 0;
-            }
-        }
-
+        /* Header styles */
         header {
             background: rgba(20, 25, 45, 0.9);
             backdrop-filter: blur(20px);
@@ -619,94 +512,7 @@
             box-shadow: 0 10px 30px rgba(212, 175, 55, 0.6);
         }
 
-        @keyframes shine {
-            0% {
-                transform: translateX(-100%) translateY(-100%) rotate(45deg);
-            }
-            100% {
-                transform: translateX(200%) translateY(200%) rotate(45deg);
-            }
-        }
-
-        .hero h1 {
-            font-size: 4rem;
-            margin-bottom: 25px;
-            background: linear-gradient(135deg, #d4af37, #b8860b, #8b4513);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-            line-height: 1.2;
-        }
-
-        .hero p {
-            font-size: 1.4rem;
-            color: #94a3b8;
-            margin-bottom: 40px;
-            line-height: 1.6;
-        }
-
-        .form-group label {
-            font-weight: 700;
-            color: #cbd5e1;
-            font-size: 16px;
-        }
-
-        .form-group input,
-        .form-group select {
-            padding: 18px 20px;
-            border: 2px solid rgba(139, 69, 19, 0.4);
-            border-radius: 15px;
-            font-size: 16px;
-            transition: all 0.3s;
-            background: rgba(30, 35, 55, 0.8);
-            backdrop-filter: blur(5px);
-            color: #e2e8f0;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus {
-            outline: none;
-            border-color: #d4af37;
-            box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
-            transform: translateY(-2px);
-        }
-
-        .form-group select option {
-            background: #1e293b;
-            color: #e2e8f0;
-        }
-
-        .section-title {
-            text-align: center;
-            font-size: 2.5rem;
-            font-weight: 800;
-            color: #e2e8f0;
-            margin-bottom: 40px;
-            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
-        }
-
-        .event-title {
-            font-size: 1.6rem;
-            font-weight: 800;
-            margin-bottom: 15px;
-            color: #e2e8f0;
-        }
-
-        .event-details {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-bottom: 25px;
-            color: #94a3b8;
-        }
-
-        .event-detail {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: 500;
-        }
-
+        /* Success Modal */
         .modal {
             display: none;
             position: fixed;
@@ -714,7 +520,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.95);
+            background: rgba(0, 0, 0, 0.9);
             z-index: 1000;
             backdrop-filter: blur(10px);
         }
@@ -728,66 +534,79 @@
             backdrop-filter: blur(20px);
             border-radius: 30px;
             padding: 50px;
-            max-width: 900px;
+            max-width: 500px;
             width: 90%;
-            max-height: 90vh;
-            overflow-y: auto;
+            text-align: center;
             box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8);
             border: 1px solid rgba(139, 69, 19, 0.3);
             color: #e2e8f0;
         }
 
-        .stage {
+        .success-icon {
+            font-size: 4rem;
+            color: #059669;
+            margin-bottom: 20px;
+        }
+
+        .modal h2 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #e2e8f0;
+            margin-bottom: 15px;
+        }
+
+        .modal p {
+            color: #94a3b8;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .modal-btn {
+            padding: 15px 30px;
             background: linear-gradient(135deg, #d4af37, #b8860b);
+            border: none;
+            border-radius: 12px;
             color: #1a1a2e;
-            text-align: center;
-            padding: 25px;
-            border-radius: 15px;
-            margin-bottom: 40px;
             font-weight: 700;
-            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .modal-btn:hover {
+            transform: translateY(-2px);
             box-shadow: 0 8px 25px rgba(212, 175, 55, 0.4);
         }
 
-        .seating-grid {
-            display: grid;
-            grid-template-columns: repeat(10, 1fr);
-            gap: 8px;
-            max-width: 600px;
-            margin: 0 auto;
-        }
+        @media (max-width: 1200px) {
+            .booking-grid {
+                grid-template-columns: 1fr;
+            }
 
-        .legend {
-            display: flex;
-            justify-content: center;
-            gap: 40px;
-            margin-top: 30px;
-        }
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-weight: 600;
-            color: #cbd5e1;
-        }
-
-        .legend-color {
-            width: 25px;
-            height: 25px;
-            border-radius: 6px;
+            .booking-panel {
+                position: static;
+            }
         }
 
         @media (max-width: 768px) {
+            .seating-grid {
+                grid-template-columns: repeat(8, 1fr);
+            }
 
-            .hero h1 {
-                font-size: 2.8rem;
+            .vip-area .seating-grid {
+                grid-template-columns: repeat(6, 1fr);
+            }
+
+            .premium-area .seating-grid {
+                grid-template-columns: repeat(8, 1fr);
+            }
+
+            .legend {
+                gap: 15px;
             }
 
             .nav-links {
                 display: none;
             }
-
         }
     </style>
 </head>
@@ -798,19 +617,13 @@
         <nav class="nav">
             <div class="logo">🎫 Ticketo</div>
             <ul class="nav-links">
-                <li><a href="file:///C:/Users/elen.khachatryan/epam/capstone%20files/final_event_booking_home.html#"
-                       onclick="showSection(&#39;home&#39;)">Home</a></li>
-
-
-                <li><a href="file:///C:/Users/elen.khachatryan/epam/capstone%20files/final_event_booking_home.html#"
-                       onclick="showSection(&#39;my-bookings&#39;)">My Bookings</a></li>
-                <li><a href="file:///C:/Users/elen.khachatryan/epam/capstone%20files/final_profile_page.html#"
-                       onclick="showSection(&#39;venues&#39;)">My Profile</a></li>
+                <li><a th:href="@{/}">Home</a></li>
+                <li><a th:href="@{/bookings}">My Bookings</a></li>
+                <li><a th:href="@{/templates/user}">My Profile</a></li>
             </ul>
             <div class="user-section">
-
-                <a href="file:///C:/Users/elen.khachatryan/epam/capstone%20files/final_event_booking_home.html#"
-                   class="btn btn-primary">Log Out</a>
+                <span th:if="${user != null}" th:text="'Welcome, ' + ${user.firstName}"></span>
+                <a th:href="@{/logout}" class="btn btn-primary">Log Out</a>
             </div>
         </nav>
     </header>
@@ -819,19 +632,19 @@
         <!-- Event & Seating Section -->
         <div class="event-section">
             <div class="event-header">
-                <h2 class="event-title">Summer Rock Festival 2025</h2>
+                <h2 class="event-title" th:text="${event.name}">Summer Rock Festival 2025</h2>
                 <div class="event-details">
                     <div class="event-detail">
                         <span>📅</span>
-                        <span>July 15, 2025 - 8:00 PM</span>
+                        <span th:text="${#temporals.format(event.dateTime, 'MMMM dd, yyyy - h:mm a')}">July 15, 2025 - 8:00 PM</span>
                     </div>
                     <div class="event-detail">
                         <span>📍</span>
-                        <span>Madison Square Garden, New York</span>
+                        <span th:text="${event.venue.name + ', ' + event.venue.city}">Madison Square Garden, New York</span>
                     </div>
                     <div class="event-detail">
                         <span>⏰</span>
-                        <span>Duration: 3 hours</span>
+                        <span th:text="'Duration: ' + ${event.duration}">Duration: 3 hours</span>
                     </div>
                 </div>
             </div>
@@ -845,26 +658,68 @@
 
                 <div class="seating-areas">
                     <!-- VIP Section -->
-                    <div class="seating-area vip-area">
-                        <h4 class="area-title">👑 VIP Section - $299</h4>
+                    <div class="seating-area vip-area" th:if="${venue.hasVipSection}">
+                        <h4 class="area-title" th:text="'👑 VIP Section - $' + ${venue.vipPrice}">👑 VIP Section - $299</h4>
                         <div class="seating-grid" id="vip-grid">
-                            <!-- VIP seats will be generated by JavaScript -->
+                            <!-- VIP seats generated by Thymeleaf -->
+                            <th:block th:each="row : ${#numbers.sequence(1, venue.vipRows)}">
+                                <button th:each="seat : ${#numbers.sequence(1, venue.vipSeatsPerRow)}"
+                                        class="seat available"
+                                        th:classappend="${venue.isOccupied('vip', row, seat)} ? 'occupied' : 'available'"
+                                        th:disabled="${venue.isOccupied('vip', row, seat)}"
+                                        th:text="${row + '' + seat}"
+                                        th:data-section="vip"
+                                        th:data-row="${row}"
+                                        th:data-seat="${seat}"
+                                        th:data-id="'vip-' + ${row} + '-' + ${seat}"
+                                        th:data-price="${venue.vipPrice}"
+                                        onclick="toggleSeat(this)">
+                                </button>
+                            </th:block>
                         </div>
                     </div>
 
                     <!-- Premium Section -->
-                    <div class="seating-area premium-area">
-                        <h4 class="area-title">⭐ Premium Section - $149</h4>
+                    <div class="seating-area premium-area" th:if="${venue.hasPremiumSection}">
+                        <h4 class="area-title" th:text="'⭐ Premium Section - $' + ${venue.premiumPrice}">⭐ Premium Section - $149</h4>
                         <div class="seating-grid" id="premium-grid">
-                            <!-- Premium seats will be generated by JavaScript -->
+                            <!-- Premium seats generated by Thymeleaf -->
+                            <th:block th:each="row : ${#numbers.sequence(1, venue.premiumRows)}">
+                                <button th:each="seat : ${#numbers.sequence(1, venue.premiumSeatsPerRow)}"
+                                        class="seat"
+                                        th:classappend="${venue.isOccupied('premium', row, seat)} ? 'occupied' : 'available'"
+                                        th:disabled="${venue.isOccupied('premium', row, seat)}"
+                                        th:text="${row + '' + seat}"
+                                        th:data-section="premium"
+                                        th:data-row="${row}"
+                                        th:data-seat="${seat}"
+                                        th:data-id="'premium-' + ${row} + '-' + ${seat}"
+                                        th:data-price="${venue.premiumPrice}"
+                                        onclick="toggleSeat(this)">
+                                </button>
+                            </th:block>
                         </div>
                     </div>
 
                     <!-- Regular Section -->
                     <div class="seating-area regular-area">
-                        <h4 class="area-title">🎪 Regular Section - $75</h4>
+                        <h4 class="area-title" th:text="'🎪 Regular Section - $' + ${venue.regularPrice}">🎪 Regular Section - $75</h4>
                         <div class="seating-grid" id="regular-grid">
-                            <!-- Regular seats will be generated by JavaScript -->
+                            <!-- Regular seats generated by Thymeleaf -->
+                            <th:block th:each="row : ${#numbers.sequence(1, venue.regularRows)}">
+                                <button th:each="seat : ${#numbers.sequence(1, venue.regularSeatsPerRow)}"
+                                        class="seat"
+                                        th:classappend="${venue.isOccupied('regular', row, seat)} ? 'occupied' : 'available'"
+                                        th:disabled="${venue.isOccupied('regular', row, seat)}"
+                                        th:text="${row + '' + seat}"
+                                        th:data-section="regular"
+                                        th:data-row="${row}"
+                                        th:data-seat="${seat}"
+                                        th:data-id="'regular-' + ${row} + '-' + ${seat}"
+                                        th:data-price="${venue.regularPrice}"
+                                        onclick="toggleSeat(this)">
+                                </button>
+                            </th:block>
                         </div>
                     </div>
                 </div>
@@ -895,172 +750,38 @@
             </div>
 
             <div class="panel-content">
-                <div class="selected-seats">
-                    <h4 class="section-title">Selected Seats</h4>
-                    <div class="seat-list" id="selected-seats-list">
-                        <div class="empty-state">
-                            No seats selected yet. Click on available seats to add them.
+                <form th:action="@{/booking/confirm}" method="post" id="booking-form">
+                    <!-- Hidden fields for form submission -->
+                    <input type="hidden" name="eventId" th:value="${event.id}">
+                    <input type="hidden" name="selectedSeats" id="selected-seats-input">
+                    <input type="hidden" name="totalAmount" id="total-amount-input">
+
+                    <div class="selected-seats">
+                        <h4 class="section-title">Selected Seats</h4>
+                        <div class="seat-list" id="selected-seats-list">
+                            <div class="empty-state">
+                                No seats selected yet. Click on available seats to add them.
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="pricing-section">
-                    <div class="price-row">
-                        <span>Subtotal:</span>
-                        <span id="subtotal">$0.00</span>
-                    </div>
-                    <div class="price-row">
-                        <span>Service Fee:</span>
-                        <span id="service-fee">$0.00</span>
-                    </div>
-                    <div class="price-row">
-                        <span>Tax:</span>
-                        <span id="tax">$0.00</span>
-                    </div>
-                    <div class="price-row price-total">
-                        <span>Total:</span>
-                        <span id="total">$0.00</span>
-                    </div>
-                </div>
-
-                <button class="book-btn" id="book-btn" disabled>
-                    🎫 Complete Booking
-                </button>
-
-                <button class="clear-btn" id="clear-btn">
-                    🗑️ Clear Selection
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Success Modal -->
-<div class="modal" id="success-modal">
-    <div class="modal-content">
-        <div class="success-icon">✅</div>
-        <h2>Booking Confirmed!</h2>
-        <p>Your tickets have been successfully booked. You will receive a confirmation email shortly with your ticket
-            details.</p>
-        <button class="modal-btn" onclick="closeModal()">Continue</button>
-    </div>
-</div>
-
-<script>
-    // Seat pricing
-    const seatPrices = {
-        vip: 299,
-        premium: 149,
-        regular: 75
-    };
-
-    // Selected seats storage
-    let selectedSeats = [];
-
-    // Generate seats for each section
-    function generateSeats() {
-        // VIP Section (8x4 = 32 seats)
-        const vipGrid = document.getElementById('vip-grid');
-        for (let row = 1; row <= 4; row++) {
-            for (let seat = 1; seat <= 8; seat++) {
-                const seatElement = createSeat('vip', row, seat);
-                vipGrid.appendChild(seatElement);
-            }
-        }
-
-        // Premium Section (10x6 = 60 seats)
-        const premiumGrid = document.getElementById('premium-grid');
-        for (let row = 1; row <= 6; row++) {
-            for (let seat = 1; seat <= 10; seat++) {
-                const seatElement = createSeat('premium', row, seat);
-                premiumGrid.appendChild(seatElement);
-            }
-        }
-
-        // Regular Section (12x8 = 96 seats)
-        const regularGrid = document.getElementById('regular-grid');
-        for (let row = 1; row <= 8; row++) {
-            for (let seat = 1; seat <= 12; seat++) {
-                const seatElement = createSeat('regular', row, seat);
-                regularGrid.appendChild(seatElement);
-            }
-        }
-    }
-
-    function createSeat(section, row, seatNum) {
-        const seat = document.createElement('button');
-        seat.className = `seat ${section}`;
-        seat.textContent = `${row}${seatNum}`;
-        seat.dataset.section = section;
-        seat.dataset.row = row;
-        seat.dataset.seat = seatNum;
-        seat.dataset.id = `${section}-${row}-${seatNum}`;
-
-        // Randomly make some seats occupied (about 20%)
-        if (Math.random() < 0.2) {
-            seat.classList.add('occupied');
-            seat.disabled = true;
-        } else {
-            seat.classList.add('available');
-            seat.addEventListener('click', () => toggleSeat(seat));
-        }
-
-        return seat;
-    }
-
-    function toggleSeat(seatElement) {
-        const seatId = seatElement.dataset.id;
-        const seatInfo = {
-            id: seatId,
-            section: seatElement.dataset.section,
-            row: seatElement.dataset.row,
-            seat: seatElement.dataset.seat,
-            price: seatPrices[seatElement.dataset.section]
-        };
-
-        if (seatElement.classList.contains('selected')) {
-            // Deselect seat
-            seatElement.classList.remove('selected');
-            seatElement.classList.add('available');
-            selectedSeats = selectedSeats.filter(seat => seat.id !== seatId);
-        } else {
-            // Select seat (max 8 seats)
-            if (selectedSeats.length >= 8) {
-                alert('Maximum 8 seats can be selected per booking.');
-                return;
-            }
-            seatElement.classList.remove('available');
-            seatElement.classList.add('selected');
-            selectedSeats.push(seatInfo);
-        }
-
-        updateBookingPanel();
-    }
-
-    function updateBookingPanel() {
-        const seatsList = document.getElementById('selected-seats-list');
-        const bookBtn = document.getElementById('book-btn');
-
-        if (selectedSeats.length === 0) {
-            seatsList.innerHTML = '<div class="empty-state">No seats selected yet. Click on available seats to add them.</div>';
-            bookBtn.disabled = true;
-        } else {
-            seatsList.innerHTML = selectedSeats.map(seat => `
-                    <div class="seat-item">
-                        <div class="seat-info">
-                            ${seat.section.toUpperCase()} - Row ${seat.row}, Seat ${seat.seat}
+                    <div class="pricing-section">
+                        <div class="price-row">
+                            <span>Subtotal:</span>
+                            <span id="subtotal">$0.00</span>
                         </div>
-                        <div style="display: flex; align-items: center; gap: 15px;">
-                            <div class="seat-price">$${seat.price}</div>
-                            <button class="remove-seat" onclick="removeSeat('${seat.id}')">×</button>
+                        <div class="price-row">
+                            <span>Service Fee:</span>
+                            <span id="service-fee">$0.00</span>
+                        </div>
+                        <div class="price-row">
+                            <span>Tax:</span>
+                            <span id="tax">$0.00</span>
+                        </div>
+                        <div class="price-row price-total">
+                            <span>Total:</span>
+                            <span id="total">$0.00</span>
                         </div>
                     </div>
-                `).join('');
 
-            bookBtn.disabled = false;
-        }
-
-    }
-</script>
-</body>
-</html>
+                    <button type

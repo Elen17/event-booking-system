@@ -145,8 +145,9 @@ public class EventController {
         model.addAttribute("searchParams", searchParams);
 
         try {
-            // Perform search
-            Pageable pageable = PageRequest.of(page, size, Sort.by("dateTime").ascending());
+            // Perform search with correct sorting by eventDate and startTime
+            Sort sort = Sort.by("eventDate").ascending();
+            Pageable pageable = PageRequest.of(page, size, sort);
             Page<Event> searchResults = eventService.searchEvents(searchParams, pageable);
 
             model.addAttribute("searchResults", searchResults.getContent());
@@ -172,7 +173,7 @@ public class EventController {
             model.addAttribute("featuredEvents", featuredEvents);
         }
 
-        return "home/index";
+        return "home/dashboard";
     }
 
     @GetMapping("/events")
@@ -232,7 +233,7 @@ public class EventController {
             model.addAttribute("error", "Unable to load events. Please try again later.");
         }
 
-        return "home/index";
+        return "home/dashboard";
     }
 
     @GetMapping("/api/events/featured")
