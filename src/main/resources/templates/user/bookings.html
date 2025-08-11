@@ -405,16 +405,16 @@
         <nav class="nav">
             <div class="logo" th:text="#{app.name}">🎫 Ticketo</div>
             <ul class="nav-links">
-                <li><a href="/" th:text="#{nav.home}">Home</a></li>
+                <li><a href="/dashboard" th:text="#{nav.home}">Home</a></li>
                 <li><a href="/events" th:text="#{nav.events}">Events</a></li>
-                <li><a href="/bookings" th:text="#{nav.bookings}" class="active">My Bookings</a></li>
-                <li><a href="/profile" th:text="#{nav.profile}">My Profile</a></li>
+                <li><a href="/user/bookings" th:text="#{nav.bookings}" class="active">My Bookings</a></li>
+                <li><a href="/user/profile" th:text="#{nav.profile}">My Profile</a></li>
             </ul>
             <div class="user-section">
                 <div class="user-info" th:if="${currentUser}">
                     <span th:text="#{greeting} + ' ' + ${currentUser.firstName}">Hello, User</span>
                 </div>
-                <a href="/logout" class="btn btn-primary" th:text="#{auth.logout}">Log Out</a>
+                <a href="/api/auth/logout" class="btn btn-primary" th:text="#{auth.logout}">Log Out</a>
             </div>
         </nav>
     </header>

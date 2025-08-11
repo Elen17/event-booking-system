@@ -4,15 +4,11 @@ import com.epam.campstone.eventbookingsystem.dto.JwtResponseDto;
 import com.epam.campstone.eventbookingsystem.dto.LoginRequestDto;
 import com.epam.campstone.eventbookingsystem.dto.TokenRefreshRequest;
 import com.epam.campstone.eventbookingsystem.service.api.LoginService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 /**
  * REST controller for authentication operations.

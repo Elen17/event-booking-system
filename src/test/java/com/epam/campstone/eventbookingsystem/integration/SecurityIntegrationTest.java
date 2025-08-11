@@ -116,7 +116,7 @@ class SecurityIntegrationTest {
                         .password("password", TEST_USER_PASSWORD));
 
         // Then logout
-        mockMvc.perform(post("/auth/logout").with(csrf()))
+        mockMvc.perform(post("/api/auth/logout").with(csrf()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/auth/login?logout"))
                 .andExpect(unauthenticated());

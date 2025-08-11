@@ -1,9 +1,12 @@
 package com.epam.campstone.eventbookingsystem.controller;
 
 import com.epam.campstone.eventbookingsystem.dto.UserProfileDto;
+import com.epam.campstone.eventbookingsystem.model.Country;
 import com.epam.campstone.eventbookingsystem.model.User;
 import com.epam.campstone.eventbookingsystem.service.api.BookingService;
+import com.epam.campstone.eventbookingsystem.service.api.CountryService;
 import com.epam.campstone.eventbookingsystem.service.api.UserService;
+import com.epam.campstone.eventbookingsystem.service.impl.CountryServiceImpl;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -13,6 +16,9 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.thymeleaf.util.ObjectUtils;
+
+import java.util.Objects;
 
 @Controller
 @RequestMapping("/user")
@@ -21,10 +27,14 @@ public class UserController {
 
     private final UserService userService;
     private final BookingService bookingService;
+    private final CountryService countryService;
 
-    public UserController(UserService userService, BookingService bookingService) {
+    public UserController(UserService userService,
+                          BookingService bookingService,
+                          CountryService countryService) {
         this.userService = userService;
         this.bookingService = bookingService;
+        this.countryService = countryService;
     }
 
     @GetMapping("/profile")
@@ -38,6 +48,8 @@ public class UserController {
             log.info("Adding user profile to model");
             UserProfileDto userProfile = mapUserProfileDto(user);
             model.addAttribute("userProfile", userProfile);
+            String country = this.countryService.findById(userProfile.getCountryId()).map(Country::getName).orElse(null);
+            model.addAttribute("country", country);
         }
 
         return "user/profile";

@@ -27,7 +27,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
         
         // User pages
         registry.addViewController("/dashboard").setViewName("home/dashboard");
-        registry.addViewController("/profile").setViewName("user/profile");
+        registry.addViewController("/user/profile").setViewName("user/profile");
         
         // Error pages
         registry.addViewController("/error/access-denied").setViewName("error/access-denied");

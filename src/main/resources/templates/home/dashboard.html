@@ -417,13 +417,9 @@
                 <div th:if="${user != null}">
                     <span class="user-greeting">Welcome, <span
                             th:text="${user.firstName} + ' ' + ${user.lastName}">User</span>!</span>
-                    <form th:action="@{/logout}" method="post" style="display: inline;">
+                    <form th:action="@{/api/auth/logout}" method="post" style="display: inline;">
                         <button type="submit" class="btn btn-primary">Log Out</button>
                     </form>
-                </div>
-                <!-- Show login/register if not authenticated -->
-                <div th:if="${user == null}">
-                    <a th:href="@{/login}" class="btn btn-primary">Login</a>
                 </div>
             </div>
         </nav>

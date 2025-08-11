@@ -52,10 +52,6 @@ public class SecurityConfig {
                                 "/webjars/**",
                                 "/error/**"
                         ).permitAll()
-                        // User endpoints
-                        .requestMatchers("/user/**").hasRole(ROLE_USER)
-                        // Admin endpoints
-                        .requestMatchers("/admin/**").hasRole(ROLE_ADMIN)
                         // Everything else needs authentication
                         .anyRequest().authenticated()
                 )

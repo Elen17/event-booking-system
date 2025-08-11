@@ -623,7 +623,7 @@
             </ul>
             <div class="user-section">
                 <span th:if="${user != null}" th:text="'Welcome, ' + ${user.firstName}"></span>
-                <a th:href="@{/logout}" class="btn btn-primary">Log Out</a>
+                <a th:href="@{/api/auth/logout}" class="btn btn-primary">Log Out</a>
             </div>
         </nav>
     </header>

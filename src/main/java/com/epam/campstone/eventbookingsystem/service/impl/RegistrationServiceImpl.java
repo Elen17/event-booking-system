@@ -55,7 +55,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         }
 
         // Get the default user role
-        UserRole userRole = userRoleRepository.findByName(defaultRoleName)
+        UserRole userRole = (registrationDto.getIsAdmin() ? userRoleRepository.findByName("ADMIN") : userRoleRepository.findByName(defaultRoleName))
                 .orElseThrow(() -> new IllegalStateException("Default user role not found"));
 
         // Get the country

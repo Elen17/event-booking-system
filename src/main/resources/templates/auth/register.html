@@ -110,6 +110,12 @@
                     <div class="error-message" th:if="${#fields.hasErrors('countryId')}" th:errors="*{countryId}"></div>
                 </div>
 
+                <div class="form-group">
+                    <label for="isAdmin">Is Admin?</label>
+                    <input type="checkbox" id="isAdmin" th:field="*{isAdmin}" required th:value="false">
+                    <div class="error-message" th:if="${#fields.hasErrors('isAdmin')}" th:errors="*{isAdmin}"></div>
+                </div>
+
                 <div class="form-group mt-3">
                     <button type="submit" class="btn btn-block">Register</button>
                 </div>

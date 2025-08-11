@@ -13,9 +13,8 @@
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background:
-                    linear-gradient(rgba(15, 15, 25, 0.85), rgba(25, 25, 40, 0.8)),
-                    url('data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAyAGQDASIAAhEBAxEB/8QAHAAAAgIDAQEAAAAAAAAAAAAAAAgABwYJCgsB/8QAOhAAAQMCBAQEAwcDBQEAAAAAAQIDEQAEBQYSITETQVFhBwiBkSJxoQcyscHR4fAUFUJSkrLxFmKC/8QAFwEAAwEAAAAAAAAAAAAAAAAAAAECA//EABoRAQEBAQEBAQAAAAAAAAAAAAEAAgMREzH/2gAMAwEAAhEDEQA/AJqSlKUOI5UKKVCtKVTW81zzaWgtpKVJ1QCCoAK4MRqIEH7w3HXcU8eUfajxyxgsHjOHeIVbtvLZdSlZp2I1O9D3E2/1x7msR5h5I8Xs88LWGi8dGm5t3QGbbVxgqSrSjT8IkAkkAblPG0qlYJj+LYvgVxd4Rg+sZkN6vRJCkEfCeojkSI6bTUOpSlCilKUKKUpQopSlCilKUKKUvJPhvmzF8rvL7JO5cJN2XUkJSpTaS2koK2o0OeJvMGClSkFSe4PbxTy7z9lrPuY7u3u8JZddw4sNNFg3bZSEFxRSklR4a/Dk6k/V7eIbKVCKUpQ4r//Z') center/cover fixed;
+            background: linear-gradient(rgba(15, 15, 25, 0.85), rgba(25, 25, 40, 0.8)),
+            url('data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAyAGQDASIAAhEBAxEB/8QAHAAAAgIDAQEAAAAAAAAAAAAAAAgABwYJCgsB/8QAOhAAAQMCBAQEAwcDBQEAAAAAAQIDEQAEBQYSITETQVFhBwiBkSJxoQcyscHR4fAUFUJSkrLxFmKC/8QAFwEAAwEAAAAAAAAAAAAAAAAAAAECA//EABoRAQEBAQEBAQAAAAAAAAAAAAEAAgMREzH/2gAMAwEAAhEDEQA/AJqSlKUOI5UKKVCtKVTW81zzaWgtpKVJ1QCCoAK4MRqIEH7w3HXcU8eUfajxyxgsHjOHeIVbtvLZdSlZp2I1O9D3E2/1x7msR5h5I8Xs88LWGi8dGm5t3QGbbVxgqSrSjT8IkAkkAblPG0qlYJj+LYvgVxd4Rg+sZkN6vRJCkEfCeojkSI6bTUOpSlCilKUKKUpQopSlCilKUKKUvJPhvmzF8rvL7JO5cJN2XUkJSpTaS2koK2o0OeJvMGClSkFSe4PbxTy7z9lrPuY7u3u8JZddw4sNNFg3bZSEFxRSklR4a/Dk6k/V7eIbKVCKUpQ4r//Z') center/cover fixed;
             min-height: 100vh;
             color: #e2e8f0;
         }
@@ -28,10 +27,9 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background:
-                    radial-gradient(circle at 20% 30%, rgba(139, 69, 19, 0.1) 0%, transparent 50%),
-                    radial-gradient(circle at 80% 70%, rgba(160, 82, 45, 0.1) 0%, transparent 50%),
-                    repeating-linear-gradient(45deg, rgba(139, 69, 19, 0.02) 0px, transparent 2px, transparent 4px, rgba(139, 69, 19, 0.02) 6px);
+            background: radial-gradient(circle at 20% 30%, rgba(139, 69, 19, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 80% 70%, rgba(160, 82, 45, 0.1) 0%, transparent 50%),
+            repeating-linear-gradient(45deg, rgba(139, 69, 19, 0.02) 0px, transparent 2px, transparent 4px, rgba(139, 69, 19, 0.02) 6px);
             pointer-events: none;
             z-index: 0;
         }
@@ -333,12 +331,12 @@
         <nav class="nav">
             <div class="logo">🎫 Ticketo</div>
             <ul class="nav-links">
-                <li><a th:href="@{/}">Home</a></li>
-                <li><a th:href="@{/bookings}">My Bookings</a></li>
-                <li><a th:href="@{/templates/user}" class="active">My Profile</a></li>
+                <li><a th:href="@{/dashboard}">Home</a></li>
+                <li><a th:href="@{/user/bookings}">My Bookings</a></li>
+                <li><a th:href="@{/user/profile}" class="active">My Profile</a></li>
             </ul>
             <div class="user-section">
-                <form th:action="@{/logout}" method="post" style="display: inline;">
+                <form th:action="@{/api/auth/logout}" method="post" style="display: inline;">
                     <button type="submit" class="btn btn-primary">Log Out</button>
                 </form>
             </div>
@@ -346,225 +344,45 @@
     </header>
 
     <div class="profile-card">
-        <!-- Success/Error Messages -->
-        <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
-        <div th:if="${errorMessage}" class="alert alert-error" th:text="${errorMessage}"></div>
-        <div th:if="${#fields.hasAnyErrors()}" class="alert alert-error">
-            <ul style="margin: 0; padding-left: 20px;">
-                <li th:each="error : ${#fields.allErrors()}" th:text="${error}"></li>
-            </ul>
-        </div>
-
         <div class="profile-header">
             <div class="profile-info">
                 <div class="avatar">
-                    <span th:text="${user.firstName != null and user.firstName.length() > 0} ? ${user.firstName.substring(0,1).toUpperCase()} : 'U'">J</span>
+                    <span th:text="${userProfile.firstName != null and userProfile.firstName.length() > 0} ? ${userProfile.firstName.substring(0,1).toUpperCase()} : 'U'">J</span>
                 </div>
                 <div class="user-details">
-                    <h2 id="display-name" th:text="${user.firstName + ' ' + user.lastName}">John Doe</h2>
-                    <p class="username">@<span id="display-username" th:text="${user.username}">john_doe123</span></p>
+                    <h2 id="display-name" th:text="${userProfile.firstName + ' ' + userProfile.lastName}"></h2>
+                    <p class="username">@<span id="display-username" th:text="${userProfile.email}"></span></p>
                 </div>
             </div>
-            <button class="edit-btn" id="edit-btn" onclick="toggleEdit()">Edit</button>
         </div>
 
         <!-- Profile Form -->
-        <form th:action="@{/templates/user}" th:object="${user}" method="post" id="profile-form">
+        <form th:action="@{/templates/user}" th:object="${userProfile}" method="post" id="profile-form">
             <div class="form-group">
-                <label class="form-label">Username</label>
-                <div id="username-display" class="form-value" th:text="*{username}">john_doe123</div>
-                <input type="text" th:field="*{username}" id="username-input" class="form-input hidden">
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Password</label>
-                <div id="password-display" class="form-value">••••••••••</div>
-                <div id="password-input-group" class="password-group hidden">
-                    <input type="password" th:field="*{password}" id="password-input" class="form-input" placeholder="Enter new password">
-                    <button type="button" class="password-toggle" onclick="togglePassword()">👁</button>
-                </div>
+                <label class="form-label">Username/Email</label>
+                <div id="username-display" class="form-value" th:text="*{email}"/>
+                <input type="text" th:field="*{email}" id="username-input" class="form-input hidden">
             </div>
 
             <div class="form-group">
                 <label class="form-label">First Name</label>
-                <div id="firstname-display" class="form-value" th:text="*{firstName}">John</div>
+                <div id="firstname-display" class="form-value" th:text="*{firstName}"></div>
                 <input type="text" th:field="*{firstName}" id="firstname-input" class="form-input hidden">
             </div>
 
             <div class="form-group">
                 <label class="form-label">Last Name</label>
-                <div id="lastname-display" class="form-value" th:text="*{lastName}">Doe</div>
+                <div id="lastname-display" class="form-value" th:text="*{lastName}"></div>
                 <input type="text" th:field="*{lastName}" id="lastname-input" class="form-input hidden">
             </div>
-
-            <div class="form-group">
-                <label class="form-label">Email</label>
-                <div id="email-display" class="email-display">
-                    <div class="email-icon">📧</div>
-                    <span class="form-value" th:text="*{email}">john.doe@email.com</span>
-                </div>
-                <input type="email" th:field="*{email}" id="email-input" class="form-input hidden">
-            </div>
-
-            <!-- Additional User Information (if available) -->
-            <div class="form-group" th:if="${user.phoneNumber}">
-                <label class="form-label">Phone Number</label>
-                <div id="phone-display" class="form-value" th:text="*{phoneNumber}">+1234567890</div>
-                <input type="tel" th:field="*{phoneNumber}" id="phone-input" class="form-input hidden">
-            </div>
-
-            <div class="form-group" th:if="${user.dateOfBirth}">
-                <label class="form-label">Date of Birth</label>
-                <div id="dob-display" class="form-value" th:text="${#temporals.format(user.dateOfBirth, 'MMM dd, yyyy')}">Jan 01, 1990</div>
-                <input type="date" th:field="*{dateOfBirth}" id="dob-input" class="form-input hidden">
-            </div>
-
-            <div class="form-group" th:if="${user.address}">
-                <label class="form-label">Address</label>
-                <div id="address-display" class="form-value" th:text="*{address}">123 Main St, City, Country</div>
-                <textarea th:field="*{address}" id="address-input" class="form-input hidden" rows="3"></textarea>
-            </div>
-
-            <!-- Account Information -->
-            <div class="form-group" th:if="${user.createdAt}">
-                <label class="form-label">Member Since</label>
-                <div class="form-value" th:text="${#temporals.format(user.createdAt, 'MMM dd, yyyy')}">Jan 01, 2023</div>
-            </div>
-
-            <div class="form-group" th:if="${user.lastLoginAt}">
-                <label class="form-label">Last Login</label>
-                <div class="form-value" th:text="${#temporals.format(user.lastLoginAt, 'MMM dd, yyyy \'at\' HH:mm')}">Dec 25, 2024 at 15:30</div>
-            </div>
-
-            <!-- Hidden field for user ID -->
-            <input type="hidden" th:field="*{id}">
-
-            <div id="form-actions" class="form-actions hidden">
-                <button type="submit" class="btn btn-primary">
-                    💾 Save Changes
-                </button>
-                <button type="button" class="btn btn-secondary" onclick="cancelEdit()">
-                    ✖ Cancel
-                </button>
-            </div>
         </form>
+
+        <div class="form-group">
+            <label class="form-label">Country</label>
+            <div id="country-display" class="form-value" th:text="*{country}"></div>
+        </div>
     </div>
 </div>
-
-<script th:inline="javascript">
-    /*<![CDATA[*/
-    let isEditing = false;
-    const user = /*[[${user}]]*/ {};
-
-    function toggleEdit() {
-        isEditing = true;
-
-        // Hide display elements
-        document.getElementById('username-display').classList.add('hidden');
-        document.getElementById('password-display').classList.add('hidden');
-        document.getElementById('firstname-display').classList.add('hidden');
-        document.getElementById('lastname-display').classList.add('hidden');
-        document.getElementById('email-display').classList.add('hidden');
-        document.getElementById('edit-btn').classList.add('hidden');
-
-        // Show input elements
-        document.getElementById('username-input').classList.remove('hidden');
-        document.getElementById('password-input-group').classList.remove('hidden');
-        document.getElementById('firstname-input').classList.remove('hidden');
-        document.getElementById('lastname-input').classList.remove('hidden');
-        document.getElementById('email-input').classList.remove('hidden');
-        document.getElementById('form-actions').classList.remove('hidden');
-
-        // Show optional fields if they exist
-        const phoneDisplay = document.getElementById('phone-display');
-        const phoneInput = document.getElementById('phone-input');
-        if (phoneDisplay && phoneInput) {
-            phoneDisplay.classList.add('hidden');
-            phoneInput.classList.remove('hidden');
-        }
-
-        const dobDisplay = document.getElementById('dob-display');
-        const dobInput = document.getElementById('dob-input');
-        if (dobDisplay && dobInput) {
-            dobDisplay.classList.add('hidden');
-            dobInput.classList.remove('hidden');
-        }
-
-        const addressDisplay = document.getElementById('address-display');
-        const addressInput = document.getElementById('address-input');
-        if (addressDisplay && addressInput) {
-            addressDisplay.classList.add('hidden');
-            addressInput.classList.remove('hidden');
-        }
-    }
-
-    function cancelEdit() {
-        isEditing = false;
-
-        // Show display elements
-        document.getElementById('username-display').classList.remove('hidden');
-        document.getElementById('password-display').classList.remove('hidden');
-        document.getElementById('firstname-display').classList.remove('hidden');
-        document.getElementById('lastname-display').classList.remove('hidden');
-        document.getElementById('email-display').classList.remove('hidden');
-        document.getElementById('edit-btn').classList.remove('hidden');
-
-        // Hide input elements
-        document.getElementById('username-input').classList.add('hidden');
-        document.getElementById('password-input-group').classList.add('hidden');
-        document.getElementById('firstname-input').classList.add('hidden');
-        document.getElementById('lastname-input').classList.add('hidden');
-        document.getElementById('email-input').classList.add('hidden');
-        document.getElementById('form-actions').classList.add('hidden');
-
-        // Hide optional fields if they exist
-        const phoneDisplay = document.getElementById('phone-display');
-        const phoneInput = document.getElementById('phone-input');
-        if (phoneDisplay && phoneInput) {
-            phoneDisplay.classList.remove('hidden');
-            phoneInput.classList.add('hidden');
-        }
-
-        const dobDisplay = document.getElementById('dob-display');
-        const dobInput = document.getElementById('dob-input');
-        if (dobDisplay && dobInput) {
-            dobDisplay.classList.remove('hidden');
-            dobInput.classList.add('hidden');
-        }
-
-        const addressDisplay = document.getElementById('address-display');
-        const addressInput = document.getElementById('address-input');
-        if (addressDisplay && addressInput) {
-            addressDisplay.classList.remove('hidden');
-            addressInput.classList.add('hidden');
-        }
-
-        // Reset form to original values
-        document.getElementById('profile-form').reset();
-    }
-
-    function togglePassword() {
-        const passwordInput = document.getElementById('password-input');
-        const toggleBtn = document.querySelector('.password-toggle');
-
-        if (passwordInput.type === 'password') {
-            passwordInput.type = 'text';
-            toggleBtn.textContent = '🙈';
-        } else {
-            passwordInput.type = 'password';
-            toggleBtn.textContent = '👁';
-        }
-    }
-
-    // Show edit mode if there are validation errors
-    document.addEventListener('DOMContentLoaded', function() {
-        const hasErrors = /*[[${#fields.hasAnyErrors()}]]*/ false;
-        if (hasErrors) {
-            toggleEdit();
-        }
-    });
-    /*]]>*/
-</script>
 
 </body>
 </html>

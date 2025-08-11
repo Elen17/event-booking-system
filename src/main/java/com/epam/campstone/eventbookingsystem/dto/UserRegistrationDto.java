@@ -36,6 +36,17 @@ public class UserRegistrationDto {
 
     private Integer countryId;
 
+    @NotBlank(message = "Is admin is user")
+    private boolean isAdmin;
+
+    public boolean getIsAdmin() {
+        return isAdmin;
+    }
+
+    public void setIsAdmin(boolean admin) {
+        isAdmin = admin;
+    }
+
     // Custom validation method to ensure passwords match
     public boolean isPasswordMatching() {
         return password != null && password.equals(confirmPassword);
