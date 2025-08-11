@@ -6,7 +6,6 @@ import com.epam.campstone.eventbookingsystem.model.User;
 import com.epam.campstone.eventbookingsystem.service.api.BookingService;
 import com.epam.campstone.eventbookingsystem.service.api.CountryService;
 import com.epam.campstone.eventbookingsystem.service.api.UserService;
-import com.epam.campstone.eventbookingsystem.service.impl.CountryServiceImpl;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -16,9 +15,6 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.thymeleaf.util.ObjectUtils;
-
-import java.util.Objects;
 
 @Controller
 @RequestMapping("/user")

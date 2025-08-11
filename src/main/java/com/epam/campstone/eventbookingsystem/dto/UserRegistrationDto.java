@@ -46,9 +46,4 @@ public class UserRegistrationDto {
     public void setIsAdmin(boolean admin) {
         isAdmin = admin;
     }
-
-    // Custom validation method to ensure passwords match
-    public boolean isPasswordMatching() {
-        return password != null && password.equals(confirmPassword);
-    }
 }

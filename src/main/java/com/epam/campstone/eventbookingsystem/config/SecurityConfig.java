@@ -17,9 +17,6 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 
-import static com.epam.campstone.eventbookingsystem.util.AppConstants.ROLE_ADMIN;
-import static com.epam.campstone.eventbookingsystem.util.AppConstants.ROLE_USER;
-
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {

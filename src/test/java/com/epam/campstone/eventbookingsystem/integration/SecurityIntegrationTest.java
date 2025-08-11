@@ -1,6 +1,7 @@
 package com.epam.campstone.eventbookingsystem.integration;
 
 import com.epam.campstone.eventbookingsystem.model.User;
+import com.epam.campstone.eventbookingsystem.model.UserPasswordHistory;
 import com.epam.campstone.eventbookingsystem.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,6 +13,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.Collections;
+
+import static jdk.internal.org.jline.reader.impl.LineReaderImpl.CompletionType.List;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders.formLogin;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.authenticated;
@@ -44,10 +48,12 @@ class SecurityIntegrationTest {
         // Create a test user
         User user = new User();
         user.setEmail(TEST_USER_EMAIL);
-        user.setPassword(passwordEncoder.encode(TEST_USER_PASSWORD));
+        UserPasswordHistory passwordHistory = new UserPasswordHistory();
+        passwordHistory.setPasswordHash(passwordEncoder.encode(TEST_USER_PASSWORD));
+        user.setUserPasswordHistories(Collections.singleton(passwordHistory));
         user.setFirstName(TEST_USER_FIRST_NAME);
         user.setLastName(TEST_USER_LAST_NAME);
-        user.setActive(true);
+        user.setIsActive(true);
         userRepository.save(user);
     }
 
