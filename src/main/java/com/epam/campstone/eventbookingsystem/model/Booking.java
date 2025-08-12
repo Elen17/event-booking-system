@@ -70,6 +70,10 @@ public class Booking {
     @Column(name = "price", nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
 
+    @NotNull
+    @Column(name = "quantity", nullable = false)
+    private Integer quantity;
+
     @Column(name = "payment_date")
     private Instant paymentDate;
 
