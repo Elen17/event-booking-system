@@ -112,7 +112,7 @@
 
                 <div class="form-group">
                     <label for="isAdmin">Is Admin?</label>
-                    <input type="checkbox" id="isAdmin" th:field="*{isAdmin}" required th:value="false">
+                    <input type="checkbox" id="isAdmin" th:field="*{isAdmin}" th:value="false">
                     <div class="error-message" th:if="${#fields.hasErrors('isAdmin')}" th:errors="*{isAdmin}"></div>
                 </div>
 

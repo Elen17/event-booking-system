@@ -20,6 +20,6 @@ public class UserProfileDto {
     private String email;
 
     @NotBlank(message = "Country is required")
-    private Integer countryId;
+    private CountryDto country;
 
 }

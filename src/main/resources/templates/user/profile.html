@@ -375,12 +375,12 @@
                 <div id="lastname-display" class="form-value" th:text="*{lastName}"></div>
                 <input type="text" th:field="*{lastName}" id="lastname-input" class="form-input hidden">
             </div>
-        </form>
 
-        <div class="form-group">
-            <label class="form-label">Country</label>
-            <div id="country-display" class="form-value" th:text="*{country}"></div>
-        </div>
+            <div class="form-group">
+                <label class="form-label">Country</label>
+                <div id="country-display" class="form-value" th:text="*{country.name}"></div>
+            </div>
+        </form>
     </div>
 </div>
 

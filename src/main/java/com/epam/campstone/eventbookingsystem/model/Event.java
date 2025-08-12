@@ -30,6 +30,11 @@ public class Event {
     private String description;
 
     @NotNull
+    @ManyToOne(fetch = FetchType.LAZY)
+    @Column(name = "created_by", nullable = false)
+    private User createdBy;
+
+    @NotNull
     @Column(name = "event_date", nullable = false)
     private LocalDate eventDate;
 

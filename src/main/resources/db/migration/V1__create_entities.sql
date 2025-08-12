@@ -109,7 +109,6 @@ CREATE TABLE IF NOT EXISTS booking_status
 
 INSERT INTO booking_status (name, description)
 VALUES ('TEMPORARY_HOLD', 'Seat temporarily reserved (2 days max)'),
-       ('CONFIRMED_BOOKING', 'Booking confirmed but not yet paid'),
        ('PURCHASED', 'Seat purchased and paid for'),
        ('EXPIRED', 'Temporary booking expired'),
        ('CANCELLED', 'Booking cancelled by user');

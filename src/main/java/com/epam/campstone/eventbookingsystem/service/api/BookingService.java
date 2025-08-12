@@ -1,6 +1,7 @@
 package com.epam.campstone.eventbookingsystem.service.api;
 
 import com.epam.campstone.eventbookingsystem.dto.BookingDto;
+import com.epam.campstone.eventbookingsystem.dto.BookingStatus;
 import com.epam.campstone.eventbookingsystem.model.Booking;
 import com.epam.campstone.eventbookingsystem.model.Seat;
 
@@ -49,4 +50,6 @@ public interface BookingService {
      * @return list of tickets for the booking
      */
     List<Seat> findSeatsByBookingId(Long bookingId);
+
+    List<Booking> findUserBookingsByStatus(String username, BookingStatus bookingStatus);
 }

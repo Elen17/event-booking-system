@@ -124,6 +124,11 @@ public class EventServiceImpl implements EventService {
         return this.eventRepository.findUpcomingEvents(Pageable.ofSize(i));
     }
 
+    @Override
+    public List<Event> getFeaturedEventsByUser(int i, Long userId) {
+        return this.eventRepository.findUpcomingEvents(Pageable.ofSize(i), userId);
+    }
+
     private void mapDtoToEntity(EventDto dto, Event entity) {
         entity.setTitle(dto.getTitle());
         entity.setDescription(dto.getDescription());
@@ -142,4 +147,5 @@ public class EventServiceImpl implements EventService {
         entity.setVenue(venue);
         entity.setAvailableAttendeesCapacity(dto.getAvailableAttendeesCapacity());
     }
+
 }

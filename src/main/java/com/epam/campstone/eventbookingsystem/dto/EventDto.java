@@ -21,8 +21,10 @@ public class EventDto {
     @Size(max = 1000, message = "Description must be less than 1000 characters")
     private String description;
 
+    @NotBlank(message = "Created by is required")
+    private UserProfileDto createdBy;
+
     @NotBlank(message = "Venue is required")
-    @Size(max = 200, message = "Venue must be less than 200 characters")
     private VenueDto venue;
 
     @NotNull(message = "Event date is required")

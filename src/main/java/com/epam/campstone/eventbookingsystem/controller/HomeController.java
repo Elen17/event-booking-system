@@ -42,20 +42,29 @@ public class HomeController {
         // Add user info if authenticated
         if (authentication != null && authentication.isAuthenticated()
                 && !authentication.getName().equals("anonymousUser")) {
-            User user = userService.findByEmail(authentication.getName()).orElseThrow(() -> new UsernameNotFoundException(String.format("User with email %s not found", authentication.getName())));
+            User user = userService.findByEmail(authentication.getName())
+                    .orElseThrow(() -> new UsernameNotFoundException(
+                            String.format("User with email %s not found", authentication.getName())));
             model.addAttribute("user", user);
 
             // Add common data for all users
             addCommonModelAttributes(model);
+
+            // Add featured events
+            if (user.getRole().getName().equals("ROLE_USER")) {
+                List<Event> featuredEvents = eventService.getFeaturedEvents(5);
+                model.addAttribute("featuredEvents", featuredEvents);
+            } else {
+                List<Event> createdEvents = eventService.getFeaturedEventsByUser(10, user.getId());
+                model.addAttribute("createdEvents", createdEvents);
+            }
 
             log.info("Authenticated user {} accessing home page", user.getEmail());
         } else {
             log.info("Anonymous user accessing home page");
         }
 
-        // Add featured events
-        List<Event> featuredEvents = eventService.getFeaturedEvents(5);
-        model.addAttribute("featuredEvents", featuredEvents);
+
 
         return "/home"; // This will render the Thymeleaf template
     }

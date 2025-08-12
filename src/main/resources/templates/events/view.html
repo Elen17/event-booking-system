@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${event.title}">Event Details</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+<div class="container">
+    <header>
+        <nav class="nav">
+            <div class="logo">🎫 Ticketo</div>
+            <ul class="nav-links">
+                <li><a th:href="@{/dashboard}">Home</a></li>
+                <li th:if="${user != null and user.role.name != 'ADMIN'}"><a th:href="@{/user/bookings}">My Bookings</a>
+                </li>
+                <li th:if="${user != null}"><a th:href="@{/user/profile}">My Profile</a></li>
+            </ul>
+            <div class="user-section">
+                <form th:if="${user != null && user.role.name == 'ADMIN'}"
+                      th:action="@{/templates/events}" method="post" style="display: inline;">
+                    <button type="submit" class="btn btn-primary">Create New Event</button>
+                </form>
+                <!-- Show user greeting and logout if authenticated -->
+                <div th:if="${user != null}">
+                    <span class="user-greeting">Welcome, <span
+                            th:text="${user.firstName} + ' ' + ${user.lastName}">User</span>!</span>
+                    <form th:action="@{/api/auth/logout}" method="post" style="display: inline;">
+                        <button type="submit" class="btn btn-primary">Log Out</button>
+                    </form>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <section class="events-section">
+        <div class="event-card" style="max-width: 800px; margin: auto;">
+            <div class="event-image"
+                 th:style="'background-image: url(' + ${event.imageUrl} + '); background-size: cover;'"
+                 th:text="${event.type.displayName}">🎵 Event
+            </div>
+            <div class="event-content">
+                <h1 class="event-title" th:text="${event.title}">Event Title</h1>
+                <div class="event-details">
+                    <div class="event-detail">📅
+                        <span th:text="${#temporals.format(LocalDateTime.of(event.eventDate, event.startTime), 'MMMM dd, yyyy - HH:mm')}"></span>
+                    </div>
+                    <div class="event-detail">📍
+                        <span th:text="${event.venue + ', ' + event.city}"></span>
+                    </div>
+                    <div class="event-detail" th:if="${event.endTime != null}">⏳
+                        <span th:text="'Duration: ' + ${event.startTime.until(event.endTime, T(java.time.temporal.ChronoUnit).HOURS)} + 'h'"></span>
+                    </div>
+                    <div class="event-detail">💵
+                        <span th:text="'From $' + ${event.minPrice}"></span>
+                    </div>
+                </div>
+                <p th:text="${event.description}"></p>
+
+                <div>
+                    <a th:if="${user != null && user.role.name == 'ADMIN'}"
+                       th:href="@{/events/{id}/edit(id=${event.id})}"
+                       class="btn btn-primary">✏ Edit Event</a>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+</body>
+</html>

@@ -1,6 +1,9 @@
 package com.epam.campstone.eventbookingsystem.controller;
 
+import com.epam.campstone.eventbookingsystem.dto.BookingStatus;
+import com.epam.campstone.eventbookingsystem.dto.CountryDto;
 import com.epam.campstone.eventbookingsystem.dto.UserProfileDto;
+import com.epam.campstone.eventbookingsystem.model.Booking;
 import com.epam.campstone.eventbookingsystem.model.Country;
 import com.epam.campstone.eventbookingsystem.model.User;
 import com.epam.campstone.eventbookingsystem.service.api.BookingService;
@@ -15,6 +18,8 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.List;
 
 @Controller
 @RequestMapping("/user")
@@ -44,8 +49,6 @@ public class UserController {
             log.info("Adding user profile to model");
             UserProfileDto userProfile = mapUserProfileDto(user);
             model.addAttribute("userProfile", userProfile);
-            String country = this.countryService.findById(userProfile.getCountryId()).map(Country::getName).orElse(null);
-            model.addAttribute("country", country);
         }
 
         return "user/profile";
@@ -105,7 +108,10 @@ public class UserController {
 
     @GetMapping("/bookings")
     public String getUserBookings(@AuthenticationPrincipal UserDetails currentUser, Model model) {
-        model.addAttribute("bookings", bookingService.findUserBookings(currentUser.getUsername()));
+        List<Booking> bookings = bookingService.findUserBookingsByStatus(currentUser.getUsername(), BookingStatus.TEMPORARY_HOLD);
+        model.addAttribute("bookings", bookings);
+        List<Booking> purchasedBookings = bookingService.findUserBookingsByStatus(currentUser.getUsername(), BookingStatus.PURCHASED);
+        model.addAttribute("purchasedBookings", purchasedBookings);
         return "user/bookings";
     }
 
@@ -114,6 +120,8 @@ public class UserController {
         userProfile.setFirstName(user.getFirstName());
         userProfile.setLastName(user.getLastName());
         userProfile.setEmail(user.getEmail());
+        CountryDto countryDto = new CountryDto(user.getCountry().getId(), user.getCountry().getName());
+        userProfile.setCountry(countryDto);
         return userProfile;
     }
 }

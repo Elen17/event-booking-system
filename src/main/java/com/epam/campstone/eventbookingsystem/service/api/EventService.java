@@ -73,4 +73,6 @@ public interface EventService {
     Page<Event> searchEvents(EventSearchDto searchParams, Pageable pageable);
 
     List<CategoryOptionDto> getCategoryOptions();
+
+    List<Event> getFeaturedEventsByUser(int i, Long userId);
 }

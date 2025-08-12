@@ -1,14 +1,11 @@
 package com.epam.campstone.eventbookingsystem.service.impl;
 
 import com.epam.campstone.eventbookingsystem.dto.UserProfileDto;
-import com.epam.campstone.eventbookingsystem.dto.UserRegistrationDto;
-import com.epam.campstone.eventbookingsystem.exception.DuplicateEmailException;
 import com.epam.campstone.eventbookingsystem.exception.DuplicatePasswordException;
 import com.epam.campstone.eventbookingsystem.exception.WrongPasswordException;
 import com.epam.campstone.eventbookingsystem.model.Country;
 import com.epam.campstone.eventbookingsystem.model.User;
 import com.epam.campstone.eventbookingsystem.model.UserPasswordHistory;
-import com.epam.campstone.eventbookingsystem.model.UserRole;
 import com.epam.campstone.eventbookingsystem.repository.UserPasswordRepository;
 import com.epam.campstone.eventbookingsystem.repository.UserRepository;
 import com.epam.campstone.eventbookingsystem.repository.UserRoleRepository;
@@ -72,7 +69,8 @@ public class UserServiceImpl implements UserService {
         User user = findByEmail(username).orElseThrow(() -> new RuntimeException("User not found"));
         user.setFirstName(userProfile.getFirstName());
         user.setLastName(userProfile.getLastName());
-        user.setCountry(countryService.findById(userProfile.getCountryId()).orElse(null));
+        Country country = countryService.findById(userProfile.getCountry().getId()).orElse(null);
+        user.setCountry(country);
     }
 
     @Transactional

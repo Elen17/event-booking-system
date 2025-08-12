@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${pageTitle ?: 'Create / Edit Event'}">Event Form</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+<div class="container">
+    <header>
+        <nav class="nav">
+            <div class="logo">🎫 Ticketo</div>
+            <ul class="nav-links">
+                <li><a th:href="@{/dashboard}">Home</a></li>
+                <li th:if="${user != null}"><a th:href="@{/user/profile}">My Profile</a></li>
+            </ul>
+            <div class="user-section">
+                <form th:if="${user != null && user.role.name == 'ADMIN'}"
+                      th:action="@{/templates/events}" method="post" style="display: inline;">
+                    <button type="submit" class="btn btn-primary">Create New Event</button>
+                </form>
+                <!-- Show user greeting and logout if authenticated -->
+                <div th:if="${user != null}">
+                    <span class="user-greeting">Welcome, <span
+                            th:text="${user.firstName} + ' ' + ${user.lastName}">User</span>!</span>
+                    <form th:action="@{/api/auth/logout}" method="post" style="display: inline;">
+                        <button type="submit" class="btn btn-primary">Log Out</button>
+                    </form>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <section class="search-section">
+        <h2 class="search-title" th:text="${formTitle ?: 'Create New Event'}"></h2>
+        <form th:action="${formAction}" method="post" th:object="${event}">
+            <input type="hidden" th:field="*{id}">
+
+            <div class="form-group">
+                <label>🎫 Title</label>
+                <input type="text" th:field="*{title}" placeholder="Event title" required>
+            </div>
+
+            <div class="form-group">
+                <label>📅 Date</label>
+                <input type="date" th:field="*{eventDate}" required>
+            </div>
+
+            <div class="form-group">
+                <label>⏰ Start Time</label>
+                <input type="time" th:field="*{startTime}" required>
+            </div>
+
+            <div class="form-group">
+                <label>⏳ End Time</label>
+                <input type="time" th:field="*{endTime}">
+            </div>
+
+            <div class="form-group">
+                <label>🎭 Category</label>
+                <select th:field="*{type}" required>
+                    <option th:each="category : ${categories}"
+                            th:value="${category.value}"
+                            th:text="${category.displayName}"></option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>📍 Venue</label>
+                <input type="text" th:field="*{venue}" placeholder="Venue name" required>
+            </div>
+
+            <div class="form-group">
+                <label>🏙 City</label>
+                <select th:field="*{city}">
+                    <option th:each="city : ${cities}"
+                            th:value="${city}"
+                            th:text="${city}"></option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>💵 Minimum Price</label>
+                <input type="number" th:field="*{minPrice}" step="0.01" required>
+            </div>
+
+            <div class="form-group">
+                <label>🖼 Image URL</label>
+                <input type="url" th:field="*{imageUrl}" placeholder="https://example.com/image.jpg">
+            </div>
+
+            <div class="form-group">
+                <label>📝 Description</label>
+                <textarea th:field="*{description}" rows="4"></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary">💾 Save Event</button>
+        </form>
+    </section>
+</div>
+</body>
+</html>

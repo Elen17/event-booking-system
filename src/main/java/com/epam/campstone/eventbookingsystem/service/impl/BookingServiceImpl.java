@@ -1,6 +1,7 @@
 package com.epam.campstone.eventbookingsystem.service.impl;
 
 import com.epam.campstone.eventbookingsystem.dto.BookingDto;
+import com.epam.campstone.eventbookingsystem.dto.BookingStatus;
 import com.epam.campstone.eventbookingsystem.dto.SeatDto;
 import com.epam.campstone.eventbookingsystem.exception.ResourceNotFoundException;
 import com.epam.campstone.eventbookingsystem.model.Booking;
@@ -72,7 +73,7 @@ public class BookingServiceImpl implements BookingService {
         booking.setCreatedAt(LocalDateTime.now().toInstant(ZoneOffset.UTC));
 
         booking.setPrice(this.calculateTotalPrice(bookingDto.getSeats()));
-        booking.setBookingStatus(bookingStatusRepository.findByName("CONFIRMED_BOOKING").get());
+        booking.setBookingStatus(bookingStatusRepository.findByName("TEMPORARY_HOLD").orElse(null));
         booking.setSeats(this.createSeats(bookingDto.getSeats()));
 //
         Booking savedBooking = bookingRepository.save(booking);
@@ -126,6 +127,11 @@ public class BookingServiceImpl implements BookingService {
     public List<Seat> findSeatsByBookingId(Long bookingId) {
         return
                 bookingRepository.findSeatsByBooking(bookingId);
+    }
+
+    @Override
+    public List<Booking> findUserBookingsByStatus(String username, BookingStatus bookingStatus) {
+        return this.bookingRepository.findByUserFilteredByStatus(username, bookingStatus.name());
     }
 
     private BigDecimal calculateTotalPrice(List<SeatDto> seats) {

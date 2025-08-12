@@ -155,4 +155,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     @Query("SELECT es.seat FROM EventSeat es WHERE es.booking.id = :booking")
     List<Seat> findSeatsByBooking(Long bookingId);
+
+    @Query("SELECT b FROM Booking b WHERE b.user.email = :username AND b.bookingStatus.name = :status ORDER BY b.createdAt DESC")
+    List<Booking> findByUserFilteredByStatus(String username, String status);
 }
