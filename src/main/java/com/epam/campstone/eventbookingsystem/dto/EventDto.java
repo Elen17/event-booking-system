@@ -31,6 +31,9 @@ public class EventDto {
     @Future(message = "Event date must be in the future")
     private LocalDateTime eventDate;
 
+    @NotNull(message = "Category is required")
+    private CategoryOptionDto category;
+
     @NotNull(message = "Capacity is required")
     @Min(value = 1, message = "Capacity must be at least 1")
     private Integer attendeesCapacity;

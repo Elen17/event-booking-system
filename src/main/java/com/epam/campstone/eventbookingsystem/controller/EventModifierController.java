@@ -1,11 +1,10 @@
 package com.epam.campstone.eventbookingsystem.controller;
 
-import com.epam.campstone.eventbookingsystem.dto.CountryDto;
-import com.epam.campstone.eventbookingsystem.dto.EventDto;
-import com.epam.campstone.eventbookingsystem.dto.UserProfileDto;
-import com.epam.campstone.eventbookingsystem.dto.VenueDto;
+import com.epam.campstone.eventbookingsystem.dto.*;
+import com.epam.campstone.eventbookingsystem.model.City;
 import com.epam.campstone.eventbookingsystem.model.Event;
 import com.epam.campstone.eventbookingsystem.model.User;
+import com.epam.campstone.eventbookingsystem.service.api.CityService;
 import com.epam.campstone.eventbookingsystem.service.api.EventService;
 import com.epam.campstone.eventbookingsystem.service.api.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -18,20 +17,23 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Controller
-@PreAuthorize("hasRole('ADMIN')")
 @RequestMapping("/events")
 @Slf4j
 public class EventModifierController {
 
     private final EventService eventService;
     private final UserService userService;
+    private final CityService cityService;
 
     public EventModifierController(EventService eventService,
-                                   UserService userService) {
+                                   UserService userService,
+                                   CityService cityService) {
         this.eventService = eventService;
         this.userService = userService;
+        this.cityService = cityService;
     }
 
     /**
@@ -44,11 +46,20 @@ public class EventModifierController {
      * @return the view name for the event creation form
      */
     @GetMapping("/new")
-    public String showCreateEventForm(Model model) {
+    public String showCreateEventForm(Model model,
+                                      Authentication authentication) {
 
         if (!model.containsAttribute("event")) {
             model.addAttribute("event", new EventDto());
         }
+        // Add user info if authenticated
+        if (authentication != null && authentication.isAuthenticated()
+                && !authentication.getName().equals("anonymousUser")) {
+            User user = userService.findByEmail(authentication.getName()).orElseThrow(() -> new UsernameNotFoundException(String.format("User with email %s not found", authentication.getName())));
+            model.addAttribute("user", user);
+        }
+        addCommonModelAttributes(model);
+
         return "events/form";
     }
 
@@ -144,6 +155,22 @@ public class EventModifierController {
         }
     }
 
+    /**
+     * Add common model attributes used across multiple pages
+     */
+    private void addCommonModelAttributes(Model model) {
+        User user = (User) model.getAttribute("user");
+        // Add available cities for search dropdown
+        List<String> cities = this.cityService.findByCountry(user.getCountry())
+                .stream().map(City::getName)
+                .toList();
+
+        model.addAttribute("cities", cities);
+
+        // Add event categories for search dropdown
+        List<CategoryOptionDto> categories = this.eventService.getCategoryOptions();
+        model.addAttribute("categories", categories);
+    }
 
     private static EventDto mapEventDto(Event event, User user) {
         EventDto eventDto = new EventDto();
@@ -172,5 +199,4 @@ public class EventModifierController {
         userProfileDto.setCountry(new CountryDto(user.getCountry().getId(), user.getCountry().getName()));
         eventDto.setCreatedBy(userProfileDto);
     }
-
 }

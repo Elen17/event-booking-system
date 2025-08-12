@@ -547,14 +547,24 @@
         <nav class="nav">
             <div class="logo">🎫 Ticketo</div>
             <ul class="nav-links">
-                <li><a th:href="@{/}">Home</a></li>
-                <li><a th:href="@{/events}">Events</a></li>
-                <li><a th:href="@{/user/bookings}">My Bookings</a></li>
-                <li><a th:href="@{/user/profile}">Profile</a></li>
+                <li><a th:href="@{/dashboard}">Home</a></li>
+                <li th:if="${user != null and user.role.name != 'ADMIN'}"><a th:href="@{/user/bookings}">My Bookings</a>
+                </li>
+                <li th:if="${user != null}"><a th:href="@{/user/profile}">My Profile</a></li>
             </ul>
             <div class="user-section">
-                <span th:if="${user != null}" th:text="'Welcome, ' + ${user.firstName}">Welcome, User</span>
-                <a th:href="@{/api/auth/logout}" class="btn btn-primary">Log Out</a>
+                <form th:if="${user != null && user.role.name == 'ADMIN'}"
+                      th:action="@{/events}" method="post" style="display: inline;">
+                    <button type="submit" class="btn btn-primary">Create New Event</button>
+                </form>
+                <!-- Show user greeting and logout if authenticated -->
+                <div th:if="${user != null}">
+                    <span class="user-greeting">Welcome, <span
+                            th:text="${user.firstName} + ' ' + ${user.lastName}">User</span>!</span>
+                    <form th:action="@{/api/auth/logout}" method="post" style="display: inline;">
+                        <button type="submit" class="btn btn-primary">Log Out</button>
+                    </form>
+                </div>
             </div>
         </nav>
     </header>
@@ -568,7 +578,7 @@
         <div class="booking-form">
             <!-- Event Header -->
             <div class="event-header">
-                <h1 class="event-title" th:text="${event.name}">Summer Rock Festival 2025</h1>
+                <h1 class="event-title" th:text="${event.title}"/>
                 <div class="event-details">
                     <div class="event-detail">
                         <span>📅</span>

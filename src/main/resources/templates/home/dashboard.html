@@ -438,7 +438,7 @@
             </ul>
             <div class="user-section">
                 <form th:if="${user != null && user.role.name == 'ADMIN'}"
-                      th:action="@{/templates/events}" method="post" style="display: inline;">
+                      th:action="@{/events}" method="post" style="display: inline;">
                     <button type="submit" class="btn btn-primary">Create New Event</button>
                 </form>
                 <!-- Show user greeting and logout if authenticated -->

@@ -163,7 +163,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     Page<Event> searchEvents(LocalDate startDate, String eventType, String city, Pageable pageable);
 
     @Query("SELECT e FROM Event e WHERE e.eventDate >= CURRENT_DATE " +
-            "AND e.created_by = :userId " +
+            "AND e.createdBy.id = :userId " +
             "ORDER BY e.eventDate, e.startTime")
     List<Event> findUpcomingEvents(Pageable pageable, Long userId);
 }

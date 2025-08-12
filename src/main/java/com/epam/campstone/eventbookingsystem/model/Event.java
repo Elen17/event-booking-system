@@ -31,7 +31,7 @@ public class Event {
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
-    @Column(name = "created_by", nullable = false)
+    @JoinColumn(name = "created_by", nullable = false)
     private User createdBy;
 
     @NotNull
