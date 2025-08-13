@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class CategoryOptionDto {
-
+    private final Long id;
     private final String value;
     private final String displayName;
 }

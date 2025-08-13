@@ -25,8 +25,7 @@ public class Booking {
     private Long id;
 
     @Size(max = 20)
-    @NotNull
-    @Column(name = "booking_reference", nullable = false, length = 20)
+    @Column(name = "booking_reference", length = 20)
     private String bookingReference;
 
     @NotNull
@@ -40,9 +39,8 @@ public class Booking {
     @JoinColumn(name = "event_id", nullable = false)
     private Event event;
 
-    @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "seat_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "seat_id")
     private Seat seat;
 
     @NotNull

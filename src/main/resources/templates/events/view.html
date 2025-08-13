@@ -47,9 +47,6 @@
                     <div class="event-detail">📍
                         <span th:text="${event.venue + ', ' + event.city}"></span>
                     </div>
-                    <div class="event-detail" th:if="${event.endTime != null}">⏳
-                        <span th:text="'Duration: ' + ${event.startTime.until(event.endTime, T(java.time.temporal.ChronoUnit).HOURS)} + 'h'"></span>
-                    </div>
                     <div class="event-detail">💵
                         <span th:text="'From $' + ${event.minPrice}"></span>
                     </div>

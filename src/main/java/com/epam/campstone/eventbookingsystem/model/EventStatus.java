@@ -19,4 +19,8 @@ public class EventStatus {
             unique = true, length = 50)
     private String name;
 
+    @Column(name = "display_name", nullable = false,
+            unique = true)
+    private String displayName;
+
 }

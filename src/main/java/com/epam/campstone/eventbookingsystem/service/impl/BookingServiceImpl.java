@@ -71,11 +71,13 @@ public class BookingServiceImpl implements BookingService {
         booking.setUser(user);
         booking.setEvent(event);
         booking.setCreatedAt(LocalDateTime.now().toInstant(ZoneOffset.UTC));
-
-        booking.setPrice(this.calculateTotalPrice(bookingDto.getSeats()));
+        booking.setQuantity(bookingDto.getQuantity());
+        booking.setPrice(event.getMinPrice().multiply(BigDecimal.valueOf(bookingDto.getQuantity())));
         booking.setBookingStatus(bookingStatusRepository.findByName("TEMPORARY_HOLD").orElse(null));
         booking.setSeats(this.createSeats(bookingDto.getSeats()));
-//
+
+        // todo: add seat logic
+
         Booking savedBooking = bookingRepository.save(booking);
 
         // Update available spots

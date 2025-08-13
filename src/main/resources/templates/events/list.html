@@ -383,18 +383,6 @@
             padding: 40px;
         }
 
-        .event-detail {
-            display: block;
-            margin-bottom: 10px;
-        }
-
-        .event-detail-value {
-            display: block;
-            margin-left: 20px;
-            padding-left: 20px;
-            border-left: 1px solid #ccc;
-        }
-
         @media (max-width: 768px) {
             .search-grid {
                 grid-template-columns: 1fr;
@@ -465,149 +453,33 @@
         </nav>
     </header>
 
-    <div th:if="${user != null and user.role.name != 'ADMIN'}">
-        <!-- Search Section -->
-        <section class="search-section">
-            <h2 class="search-title" th:text="${searchTitle ?: 'Find Your Perfect Event'}">Find Your Perfect Event</h2>
-            <form th:action="@{/events/search}" method="get">
-                <div class="search-grid">
-                    <div class="form-group">
-                        <label for="location">📍 Location</label>
-                        <select required id="location" name="location" th:value="${searchParams?.city}">
-                            <option value="">Select City</option>
-                            <option th:each="city : ${cities}"
-                                    th:value="${city}"
-                                    th:text="${city}"
-                                    th:selected="${city == searchParams?.city}">City
-                            </option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="date">📅 Date</label>
-                        <input required type="date" id="date" name="date" th:value="${searchParams?.date}">
-                    </div>
-                    <div class="form-group">
-                        <label for="category">🎭 Category</label>
-                        <select required id="category" name="category" th:value="${searchParams?.category}">
-                            <option value="">All Categories</option>
-                            <option th:each="category : ${categories}"
-                                    th:value="${category.value}"
-                                    th:text="${category.displayName}"
-                                    th:selected="${category.value == searchParams?.category}">Category
-                            </option>
-                        </select>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Search Events</button>
-                </div>
-            </form>
-
-            <div id="search-results" class="search-results" th:classappend="${searchResults != null} ? 'active'">
-                <h3 th:if="${searchResults != null and !searchResults.isEmpty()}"
-                    class="section-title"
-                    th:text="'Search Results: (' + ${searchResults.size()} + ' event' + ${searchResults.size() == 1 ? '' : 's found)'}">Search
-                    Results</h3>
-
-                <div th:if="${searchResults != null and searchResults.isEmpty()}" class="no-results">
-                    No events found matching your criteria. Please try different search parameters.
-                </div>
-
-                <div th:if="${searchResults != null and !searchResults.isEmpty()}" class="events-grid">
-                    <div th:each="event : ${searchResults}" class="event-card"
-                         th:onclick="openEventModal(${event.id})">
-                        <div class="event-image" th:text="${event.type.displayName}">🎵 Event</div>
-                        <div class="event-content">
-                            <h3 class="event-title" th:text="${event.title}">Event Title</h3>
-                            <div class="event-details">
-                                <div class="event-detail">
-                                    <span>📅</span>
-                                    <span th:text="${#temporals.format(event.eventDate, 'MMMM dd, yyyy') + ' - ' + #temporals.format(event.startTime, 'HH:mm')}">Date and Time</span>
-                                </div>
-                                <div class="event-detail">
-                                    <span>📍</span>
-                                    <span th:text="${event.venue.name + ', ' + event.venue.address + ', ' + event.venue.city.name}">Venue, Location</span>
-                                </div>
-                            </div>
-                            <div class="event-price" th:text="'From $' + ${event.minPrice}">From $0</div>
-                            <a th:href="@{/bookings/new/{id}(id=${event.id})}" class="btn btn-primary">🎫 Book Now</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section class="events-section">
-            <h2 class="section-title">🌟 <span th:text="${featuredTitle ?: 'Featured Events'}">Featured Events</span>
-            </h2>
-            <div class="events-grid" id="events-grid-featured">
-                <div th:each="event : ${upcomingEvents}"
-                     class="event-card"
-                     th:onclick="openEventModal(${event.id})">
-                    <div class="event-image" th:text="${event.type.displayName}">🎵 Event</div>
-                    <div class="event-content">
-                        <h3 class="event-title" th:text="${event.title}">Event Title</h3>
-                        <div class="event-details">
-                            <div class="event-detail">
-                                <label>Date and Time:</label>
-                            </div>
-                            <div class="event-detail-value">
-                                <span>📅</span>
-                                <span th:text="${#temporals.format(event.eventDate, 'MMMM dd, yyyy')}"/>
-                                <span th:text="${#temporals.format(event.startTime, ' - HH:mm')}"/>
-                            </div>
-                            <div class="event-detail">
-                                <label>Venue:</label>
-                            </div>
-                            <div class="event-detail-value">
-                                <span>📍</span>
-                                <span th:text="${event.venue.name + ', ' + event.venue.address}">Venue, Location</span>
-                            </div>
-                            <div class="event-price" th:text="'From $' + ${event.minPrice}">From $0</div>
-                            <a th:href="@{/bookings/new/{id}(id=${event.id})}" class="btn btn-primary">🎫 Book Now</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Show message if no featured events -->
-            <div th:if="${upcomingEvents == null or upcomingEvents.isEmpty()}" class="no-results">
-                <p>No featured events available at the moment. Check back later!</p>
-            </div>
-        </section>
-    </div>
-
     <div th:if="${user != null and user.role.name == 'ADMIN'}">
 
         <section class="events-section">
             <h2 class="section-title">🌟 <span>Created Events by You</span>
             </h2>
             <div class="events-grid" id="events-grid">
-                <div th:each="event : ${createdEvents}"
-                     class="event-card">
+                <div th:each="event : ${events}"
+                     class="event-card"
+                     th:if="${event.getEventDate().isAfter(LocalDateTime.now())}">
                     <div class="event-image" th:text="${event.type.displayName}">🎵 Event</div>
                     <div class="event-content">
                         <h3 class="event-title" th:text="${event.title}">Event Title</h3>
                         <div class="event-details">
                             <div class="event-detail">
-                                <label>Date and Time:</label>
-                            </div>
-                            <div class="event-detail-value">
                                 <span>📅</span>
-                                <span th:text="${#temporals.format(event.eventDate, 'MMMM dd, yyyy')}"/>
-                                <span th:text="${#temporals.format(event.startTime, ' - HH:mm')}"/>
+                                <span th:text="${#temporals.format(LocalDateTime.of(event.eventDate, event.startTime), 'MMMM dd, yyyy - HH:mm')}">Date and Time</span>
                             </div>
                             <div class="event-detail">
-                                <label>Venue:</label>
-                            </div>
-                            <div class="event-detail-value">
                                 <span>📍</span>
-                                <span th:text="${event.venue.name + ', ' + event.venue.address}">Venue, Location</span>
+                                <span th:text="${event.venue + ', ' + event.venue.name}">Venue, Location</span>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
             <!-- Show message if no featured events -->
-            <div th:if="${createdEvents == null or createdEvents.isEmpty()}" class="no-results">
+            <div th:if="${events == null or events.isEmpty()}" class="no-results">
                 <p>No created events by you!</p>
             </div>
         </section>

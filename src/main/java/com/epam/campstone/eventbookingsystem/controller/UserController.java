@@ -45,6 +45,8 @@ public class UserController {
         User user = userService.findByEmail(currentUser.getUsername())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
+        model.addAttribute("user", user);
+
         if (!model.containsAttribute("userProfile")) {
             log.info("Adding user profile to model");
             UserProfileDto userProfile = mapUserProfileDto(user);
@@ -108,6 +110,9 @@ public class UserController {
 
     @GetMapping("/bookings")
     public String getUserBookings(@AuthenticationPrincipal UserDetails currentUser, Model model) {
+        User user = userService.findByEmail(currentUser.getUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        model.addAttribute("user", user);
         List<Booking> bookings = bookingService.findUserBookingsByStatus(currentUser.getUsername(), BookingStatus.TEMPORARY_HOLD);
         model.addAttribute("bookings", bookings);
         List<Booking> purchasedBookings = bookingService.findUserBookingsByStatus(currentUser.getUsername(), BookingStatus.PURCHASED);
@@ -117,6 +122,7 @@ public class UserController {
 
     private static UserProfileDto mapUserProfileDto(User user) {
         UserProfileDto userProfile = new UserProfileDto();
+        userProfile.setId(user.getId());
         userProfile.setFirstName(user.getFirstName());
         userProfile.setLastName(user.getLastName());
         userProfile.setEmail(user.getEmail());

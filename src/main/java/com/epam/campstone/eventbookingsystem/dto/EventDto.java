@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
@@ -22,7 +23,7 @@ public class EventDto {
     private String description;
 
     @NotBlank(message = "Created by is required")
-    private UserProfileDto createdBy;
+    private Long createdBy;
 
     @NotBlank(message = "Venue is required")
     private VenueDto venue;
@@ -32,7 +33,7 @@ public class EventDto {
     private LocalDateTime eventDate;
 
     @NotNull(message = "Category is required")
-    private CategoryOptionDto category;
+    private Long category;
 
     @NotNull(message = "Capacity is required")
     @Min(value = 1, message = "Capacity must be at least 1")
@@ -41,6 +42,9 @@ public class EventDto {
     @NotNull(message = "Available capacity is required")
     @Min(value = 1, message = "Available capacity must be at least 1")
     private Integer availableAttendeesCapacity;
+
+    @NotNull(message = "Price is required")
+    private BigDecimal price;
 
 
 }

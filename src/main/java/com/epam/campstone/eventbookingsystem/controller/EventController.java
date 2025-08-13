@@ -26,7 +26,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Controller
-@RequestMapping("")
+@RequestMapping("/events")
 @Slf4j
 public class EventController {
 
@@ -118,15 +118,8 @@ public class EventController {
         log.info("Searching events with params - location: {}, date: {}, category: {}",
                 location, date, category);
 
-        // Add user info if authenticated
-        if (authentication != null && authentication.isAuthenticated()
-                && !authentication.getName().equals("anonymousUser")) {
-            User user = userService.findByEmail(authentication.getName()).orElseThrow(() -> new UsernameNotFoundException(String.format("User with email %s not found", authentication.getName())));
-            model.addAttribute("user", user);
-        }
-
         // Add common model attributes
-        addCommonModelAttributes(model);
+        addCommonModelAttributes(model, authentication);
 
         // Create search parameters object
         EventSearchDto searchParams = new EventSearchDto();
@@ -193,7 +186,7 @@ public class EventController {
             model.addAttribute("user", user);
         }
 
-        addCommonModelAttributes(model);
+        addCommonModelAttributes(model, authentication);
 
         try {
             // Create sort object
@@ -248,19 +241,23 @@ public class EventController {
     /**
      * Add common model attributes used across multiple pages
      */
-    private void addCommonModelAttributes(Model model) {
-        User user = (User) model.getAttribute("user");
-        // Add available cities for search dropdown
-        List<String> cities = this.cityService.findByCountry(user.getCountry())
-                .stream().map(City::getName)
-                .toList();
+    private void addCommonModelAttributes(Model model, Authentication authentication) {
+        // Add user info if authenticated
+        if (authentication != null && authentication.isAuthenticated()
+                && !authentication.getName().equals("anonymousUser")) {
+            User user = userService.findByEmail(authentication.getName()).orElseThrow(() -> new UsernameNotFoundException(String.format("User with email %s not found", authentication.getName())));
+            model.addAttribute("user", user);
 
-        model.addAttribute("cities", cities);
+            // Add available cities for search dropdown
+            List<String> cities = this.cityService.findByCountry(user.getCountry())
+                    .stream().map(City::getName)
+                    .toList();
 
-        // Add event categories for search dropdown
-        List<CategoryOptionDto> categories = this.eventService.getCategoryOptions();
-        model.addAttribute("categories", categories);
+            model.addAttribute("cities", cities);
+
+            // Add event categories for search dropdown
+            List<CategoryOptionDto> categories = this.eventService.getCategoryOptions();
+            model.addAttribute("categories", categories);
+        }
     }
-
-
 }

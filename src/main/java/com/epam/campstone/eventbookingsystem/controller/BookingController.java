@@ -69,7 +69,7 @@ public class BookingController {
         } catch (Exception e) {
             log.error("Error loading booking form for event {}: {}", eventId, e.getMessage());
             model.addAttribute("errorMessage", "Error loading booking form: " + e.getMessage());
-            return "redirect:/events";
+            return "redirect:/dashboard";
         }
     }
 
@@ -78,7 +78,7 @@ public class BookingController {
             @Valid @ModelAttribute("booking") BookingDto bookingDto,
             BindingResult bindingResult,
             @AuthenticationPrincipal UserDetails currentUser,
-            @RequestParam(value = "quantity", defaultValue = "0") int quantity,
+            @RequestParam(value = "ticketQuantity", defaultValue = "0") int quantity,
             RedirectAttributes redirectAttributes,
             Model model) {
 
@@ -226,6 +226,6 @@ public class BookingController {
     public String handleValidationError(IllegalArgumentException e, RedirectAttributes redirectAttributes) {
         log.warn("Booking validation error: {}", e.getMessage());
         redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
-        return "redirect:/events";
+        return "redirect:/dashboard";
     }
 }

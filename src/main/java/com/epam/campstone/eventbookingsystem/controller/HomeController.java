@@ -64,14 +64,12 @@ public class HomeController {
             log.info("Anonymous user accessing home page");
         }
 
-
-
-        return "/home"; // This will render the Thymeleaf template
+        return "home/dashboard";
     }
 
     @GetMapping("/home")
     public String homePage() {
-        return "redirect:/";
+        return "redirect:/dashboard";
     }
 
     @GetMapping("/dashboard")
@@ -92,11 +90,18 @@ public class HomeController {
         // model.addAttribute("recentBookings", recentBookings);
 
         // Get upcoming events
-        List<Event> upcomingEvents = eventService.getFeaturedEvents(8);
-        model.addAttribute("upcomingEvents", upcomingEvents);
 
-        model.addAttribute("pageTitle", "Dashboard - Ticketo");
-        model.addAttribute("featuredTitle", "Recommended for You");
+        // Add featured events
+        if (user.getRole().getName().equals("USER")) {
+            List<Event> featuredEvents = eventService.getFeaturedEvents(5);
+            model.addAttribute("upcomingEvents", featuredEvents);
+
+            model.addAttribute("pageTitle", "Dashboard - Ticketo");
+            model.addAttribute("featuredTitle", "Recommended for You");
+        } else {
+            List<Event> createdEvents = eventService.getFeaturedEventsByUser(10, user.getId());
+            model.addAttribute("createdEvents", createdEvents);
+        }
 
         log.info("User {} accessing dashboard", user.getEmail());
         return "home/dashboard"; // Same template, different data

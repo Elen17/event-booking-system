@@ -7,6 +7,9 @@ import lombok.Data;
 
 @Data
 public class UserProfileDto {
+    @NotBlank(message = "ID is required")
+    private Long id;
+
     @NotBlank(message = "First name is required")
     @Size(max = 50, message = "First name must be less than 50 characters")
     private String firstName;

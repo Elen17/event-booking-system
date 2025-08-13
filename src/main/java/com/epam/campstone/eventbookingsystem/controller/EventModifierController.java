@@ -8,7 +8,6 @@ import com.epam.campstone.eventbookingsystem.service.api.CityService;
 import com.epam.campstone.eventbookingsystem.service.api.EventService;
 import com.epam.campstone.eventbookingsystem.service.api.UserService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
@@ -18,6 +17,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Controller
 @RequestMapping("/events")
@@ -48,17 +48,13 @@ public class EventModifierController {
     @GetMapping("/new")
     public String showCreateEventForm(Model model,
                                       Authentication authentication) {
-
+        addCommonModelAttributes(model, authentication);
+        User user = (User) model.getAttribute("user");
         if (!model.containsAttribute("event")) {
+            EventDto eventDto = new EventDto();
+            eventDto.setCreatedBy(Objects.requireNonNull(user).getId());
             model.addAttribute("event", new EventDto());
         }
-        // Add user info if authenticated
-        if (authentication != null && authentication.isAuthenticated()
-                && !authentication.getName().equals("anonymousUser")) {
-            User user = userService.findByEmail(authentication.getName()).orElseThrow(() -> new UsernameNotFoundException(String.format("User with email %s not found", authentication.getName())));
-            model.addAttribute("user", user);
-        }
-        addCommonModelAttributes(model);
 
         return "events/form";
     }
@@ -78,15 +74,22 @@ public class EventModifierController {
     @PostMapping
     public String createEvent(
             @ModelAttribute("event") EventDto eventDto,
-            RedirectAttributes redirectAttributes) {
+            RedirectAttributes redirectAttributes,
+            Authentication authentication) {
 
         try {
-            log.info("Creating new event: {}", eventDto.getTitle());
-            eventService.createEvent(eventDto);
+            if (authentication != null && authentication.isAuthenticated()
+                    && !authentication.getName().equals("anonymousUser")) {
+                User user = userService.findByEmail(authentication.getName()).orElseThrow(() -> new UsernameNotFoundException(String.format("User with email %s not found", authentication.getName())));
 
-            log.info("Event created successfully: {}: {}", eventDto.getId(), eventDto.getTitle());
-            redirectAttributes.addFlashAttribute("successMessage", "Event created successfully!");
-            return "redirect:/events";
+                log.info("Creating new event: {}", eventDto.getTitle());
+                eventDto.setCreatedBy(user.getId());
+                eventService.createEvent(eventDto);
+
+                log.info("Event created successfully: {}: {}", eventDto.getId(), eventDto.getTitle());
+                redirectAttributes.addFlashAttribute("successMessage", "Event created successfully!");
+            }
+            return "redirect:/dashboard";
         } catch (Exception e) {
             log.error("Error creating event: {}", e.getMessage());
             redirectAttributes.addFlashAttribute("errorMessage", "Error creating event: " + e.getMessage());
@@ -158,18 +161,21 @@ public class EventModifierController {
     /**
      * Add common model attributes used across multiple pages
      */
-    private void addCommonModelAttributes(Model model) {
-        User user = (User) model.getAttribute("user");
-        // Add available cities for search dropdown
-        List<String> cities = this.cityService.findByCountry(user.getCountry())
-                .stream().map(City::getName)
-                .toList();
+    private void addCommonModelAttributes(Model model, Authentication authentication) {
+        if (authentication != null && authentication.isAuthenticated()
+                && !authentication.getName().equals("anonymousUser")) {
+            User user = userService.findByEmail(authentication.getName()).orElseThrow(() -> new UsernameNotFoundException(String.format("User with email %s not found", authentication.getName())));
 
-        model.addAttribute("cities", cities);
+            model.addAttribute("user", user);
+            // Add available cities for search dropdown
+            List<City> cities = this.cityService.findByCountry(Objects.requireNonNull(user).getCountry());
 
-        // Add event categories for search dropdown
-        List<CategoryOptionDto> categories = this.eventService.getCategoryOptions();
-        model.addAttribute("categories", categories);
+            model.addAttribute("cities", cities);
+
+            // Add event categories for search dropdown
+            List<CategoryOptionDto> categories = this.eventService.getCategoryOptions();
+            model.addAttribute("categories", categories);
+        }
     }
 
     private static EventDto mapEventDto(Event event, User user) {
@@ -193,10 +199,11 @@ public class EventModifierController {
 
     private static void mapUserProfileDto(User user, EventDto eventDto) {
         UserProfileDto userProfileDto = new UserProfileDto();
+        userProfileDto.setId(user.getId());
         userProfileDto.setFirstName(user.getFirstName());
         userProfileDto.setLastName(user.getLastName());
         userProfileDto.setEmail(user.getEmail());
         userProfileDto.setCountry(new CountryDto(user.getCountry().getId(), user.getCountry().getName()));
-        eventDto.setCreatedBy(userProfileDto);
+        eventDto.setCreatedBy(userProfileDto.getId());
     }
 }

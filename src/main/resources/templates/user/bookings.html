@@ -427,20 +427,20 @@
                     <div class="history-item" th:each="booking : ${bookings}">
                         <div class="item-header">
                             <div>
-                                <h4 class="item-title" th:text="${booking.event.name}">Event Name</h4>
-                                <p class="item-location" th:text="${booking.event.venue}">Event Venue</p>
+                                <h4 class="item-title" th:text="${booking.event.title}">Event Name</h4>
+                                <p class="item-location" th:text="${booking.event.venue.name + ', ' + booking.event.venue.address + booking.event.venue.city}">Event Venue</p>
                             </div>
                             <span class="status-badge"
-                                  th:classappend="${'status-' + #strings.toLowerCase(booking.bookingStatus)}"
-                                  th:text="#{${'booking.status.' + #strings.toLowerCase(booking.bookingStatus)}}">
+                                  th:classappend="${'status-' + booking.bookingStatus.displayName}"
+                                  th:text="${'Status: ' + booking.bookingStatus.displayName}">
                                     Status
                                 </span>
                         </div>
                         <div class="item-footer">
-                                <span th:text="${#temporals.format(booking.event.eventDate, 'MMM dd, yyyy')}">
+                                <span th:text="${#temporals.format(booking.event.eventDate, 'MMM dd, yyyy')  + ' - ' + #temporals.format(booking.event.startTime, 'HH:mm')}">
                                     Date: Event Date
                                 </span>
-                            <span th:text="${booking.seats.size()}">
+                            <span th:text="${booking.quantity}">
                                     Tickets: Quantity
                                 </span>
                             <span th:if="${booking.price}"
@@ -501,7 +501,7 @@
                 </div>
 
                 <!-- Empty state -->
-                <div th:if="${#lists.isEmpty(tickets)}" class="empty-state">
+                <div th:if="${#lists.isEmpty(purchasedBookings)}" class="empty-state">
                     <h3>No tickets yet</h3>
                     <p>You haven't purchased any tickets yet.</p>
                 </div>

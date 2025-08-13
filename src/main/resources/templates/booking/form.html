@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="'Book Tickets - ' + ${event.name}">Book Tickets - Ticketo</title>
+    <title th:text="'Book Tickets - ' + ${event.title}">Book Tickets - Ticketo</title>
     <style>
         * {
             margin: 0;
@@ -582,15 +582,11 @@
                 <div class="event-details">
                     <div class="event-detail">
                         <span>📅</span>
-                        <span th:text="${#temporals.format(event.dateTime, 'MMMM dd, yyyy - h:mm a')}">July 15, 2025 - 8:00 PM</span>
+                        <span th:text="${#temporals.format(event.eventDate, 'MMMM dd, yyyy') + ' - ' + #temporals.format(event.startTime, 'HH:mm')}"/>
                     </div>
                     <div class="event-detail">
                         <span>📍</span>
                         <span th:text="${event.venue.name + ', ' + event.venue.city}">Madison Square Garden, New York</span>
-                    </div>
-                    <div class="event-detail">
-                        <span>⏰</span>
-                        <span th:text="'Duration: ' + ${event.duration}">Duration: 3 hours</span>
                     </div>
                 </div>
             </div>
@@ -599,6 +595,7 @@
             <div class="form-content">
                 <form th:action="@{/bookings}" method="post" th:object="${booking}" id="booking-form">
                     <input type="hidden" th:field="*{eventId}" th:value="${eventId}">
+                    <input type="hidden" id="selected-quantity" name="ticketQuantity" value="0">
 
                     <!-- Seat Selection -->
                     <div class="form-section">
@@ -608,93 +605,25 @@
                         </h2>
 
                         <div class="seat-types">
-                            <!-- VIP Tickets -->
-                            <div class="seat-type" th:if="${event.venue.hasVipSection}"
-                                 th:classappend="${event.venue.vipAvailable <= 0} ? 'unavailable' : ''"
-                                 onclick="selectSeatType('vip', this)">
-                                <div class="seat-type-name">👑 VIP Section</div>
-                                <div class="seat-type-price" th:text="'$' + ${event.venue.vipPrice}">$299</div>
-                                <div class="seat-type-available"
-                                     th:text="${event.venue.vipAvailable} + ' available'">50 available</div>
-                                <div class="quantity-selector" style="display: none;">
-                                    <button type="button" class="quantity-btn" onclick="changeQuantity('vip', -1)">-</button>
-                                    <div class="quantity-display" id="vip-quantity">0</div>
-                                    <button type="button" class="quantity-btn" onclick="changeQuantity('vip', 1)">+</button>
-                                </div>
-                                <input type="hidden" name="vipQuantity" id="vip-input" value="0">
-                            </div>
-
-                            <!-- Premium Tickets -->
-                            <div class="seat-type" th:if="${event.venue.hasPremiumSection}"
-                                 th:classappend="${event.venue.premiumAvailable <= 0} ? 'unavailable' : ''"
-                                 onclick="selectSeatType('premium', this)">
-                                <div class="seat-type-name">⭐ Premium Section</div>
-                                <div class="seat-type-price" th:text="'$' + ${event.venue.premiumPrice}">$149</div>
-                                <div class="seat-type-available"
-                                     th:text="${event.venue.premiumAvailable} + ' available'">200 available</div>
-                                <div class="quantity-selector" style="display: none;">
-                                    <button type="button" class="quantity-btn" onclick="changeQuantity('premium', -1)">-</button>
-                                    <div class="quantity-display" id="premium-quantity">0</div>
-                                    <button type="button" class="quantity-btn" onclick="changeQuantity('premium', 1)">+</button>
-                                </div>
-                                <input type="hidden" name="premiumQuantity" id="premium-input" value="0">
-                            </div>
-
                             <!-- Regular Tickets -->
-                            <div class="seat-type"
-                                 th:classappend="${event.venue.regularAvailable <= 0} ? 'unavailable' : ''"
-                                 onclick="selectSeatType('regular', this)">
+                            <div class="seat-type" id="regular-seat-type"
+                                 th:classappend="${event.availableAttendeesCapacity <= 0} ? 'unavailable' : ''"
+                                 onclick="selectSeat(this)">
                                 <div class="seat-type-name">🎪 Regular Section</div>
-                                <div class="seat-type-price" th:text="'$' + ${event.venue.regularPrice}">$75</div>
-                                <div class="seat-type-available"
-                                     th:text="${event.venue.regularAvailable} + ' available'">500 available</div>
-                                <div class="quantity-selector" style="display: none;">
-                                    <button type="button" class="quantity-btn" onclick="changeQuantity('regular', -1)">-</button>
-                                    <div class="quantity-display" id="regular-quantity">0</div>
-                                    <button type="button" class="quantity-btn" onclick="changeQuantity('regular', 1)">+</button>
+                                <div class="seat-type-price" th:text="'$' + ${event.minPrice}">$75</div>
+                                <div class="seat-type-available" id="available-count"
+                                     th:text="${event.availableAttendeesCapacity} + ' available'">500 available
                                 </div>
-                                <input type="hidden" name="regularQuantity" id="regular-input" value="0">
+                                <div class="quantity-selector" id="quantity-selector" style="display: none;">
+                                    <button type="button" class="quantity-btn" onclick="changeQuantity(-1); event.stopPropagation();">
+                                        -
+                                    </button>
+                                    <div class="quantity-display" id="regular-quantity">0</div>
+                                    <button type="button" class="quantity-btn" onclick="changeQuantity(1); event.stopPropagation();">
+                                        +
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-
-                    <!-- Customer Information -->
-                    <div class="form-section">
-                        <h2 class="section-title">
-                            <span>👤</span>
-                            Contact Information
-                        </h2>
-
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="firstName" class="required">First Name</label>
-                                <input type="text" th:field="*{firstName}" id="firstName"
-                                       placeholder="John" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="lastName" class="required">Last Name</label>
-                                <input type="text" th:field="*{lastName}" id="lastName"
-                                       placeholder="Doe" required>
-                            </div>
-                        </div>
-
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="email" class="required">Email</label>
-                                <input type="email" th:field="*{email}" id="email"
-                                       placeholder="john.doe@example.com" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="phone">Phone Number</label>
-                                <input type="tel" th:field="*{phone}" id="phone"
-                                       placeholder="+1 (555) 123-4567">
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="specialRequests">Special Requests (Optional)</label>
-                            <textarea th:field="*{specialRequests}" id="specialRequests"
-                                      placeholder="Any special accommodations or requests..." rows="3"></textarea>
                         </div>
                     </div>
                 </form>
@@ -710,24 +639,12 @@
 
             <div class="summary-content">
                 <div class="selected-tickets" id="selected-tickets">
-                    <div class="empty-selection">
+                    <div class="empty-selection" id="empty-selection">
                         No tickets selected yet. Choose tickets from the left to see your summary.
                     </div>
                 </div>
 
                 <div class="pricing-breakdown" id="pricing-breakdown" style="display: none;">
-                    <div class="price-row">
-                        <span>Subtotal:</span>
-                        <span id="subtotal-amount">$0.00</span>
-                    </div>
-                    <div class="price-row">
-                        <span>Service Fee (8.5%):</span>
-                        <span id="service-fee-amount">$0.00</span>
-                    </div>
-                    <div class="price-row">
-                        <span>Tax (7.25%):</span>
-                        <span id="tax-amount">$0.00</span>
-                    </div>
                     <div class="price-row price-total">
                         <span>Total:</span>
                         <span id="total-amount">$0.00</span>
@@ -737,36 +654,20 @@
                 <button type="submit" class="checkout-btn" id="checkout-btn" form="booking-form" disabled>
                     Complete Booking
                 </button>
-
-                <a th:href="@{'/events/' + ${eventId}}" class="btn btn-secondary" style="width: 100%; text-align: center;">
-                    ← Back to Event
-                </a>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-    // Ticket pricing data from server
-    const ticketPrices = {
-        vip: /*[[${event.venue.vipPrice}]]*/ 299,
-        premium: /*[[${event.venue.premiumPrice}]]*/ 149,
-        regular: /*[[${event.venue.regularPrice}]]*/ 75
-    };
+    // Get ticket price from server-side data
+    const ticketPrice = parseFloat(document.querySelector('.seat-type-price').textContent.replace('$', ''));
+    const maxAvailable = parseInt(document.querySelector('#available-count').textContent.split(' ')[0]);
 
-    const ticketAvailable = {
-        vip: /*[[${event.venue.vipAvailable}]]*/ 50,
-        premium: /*[[${event.venue.premiumAvailable}]]*/ 200,
-        regular: /*[[${event.venue.regularAvailable}]]*/ 500
-    };
+    let regularQuantity = 0;
+    let totalPrice = 0;
 
-    const quantities = {
-        vip: 0,
-        premium: 0,
-        regular: 0
-    };
-
-    function selectSeatType(type, element) {
+    function selectSeat(element) {
         if (element.classList.contains('unavailable')) return;
 
         const quantitySelector = element.querySelector('.quantity-selector');
@@ -775,5 +676,127 @@
         if (!isSelected) {
             element.classList.add('selected');
             quantitySelector.style.display = 'flex';
-            changeQuantity(type, 1);
+            changeQuantity(1);
+        } else {
+            // Deselect if clicking again and reset quantity
+            element.classList.remove('selected');
+            quantitySelector.style.display = 'none';
+            regularQuantity = 0;
+            updateDisplay();
         }
+    }
+
+    function changeQuantity(delta) {
+        // Stop event propagation to prevent seat selection
+        event.stopPropagation();
+
+        const newQuantity = regularQuantity + delta;
+
+        // Validate bounds
+        if (newQuantity < 0 || newQuantity > maxAvailable || newQuantity > 8) {
+            return;
+        }
+
+        regularQuantity = newQuantity;
+
+        // If quantity becomes 0, deselect the seat
+        if (regularQuantity === 0) {
+            const seatElement = document.getElementById('regular-seat-type');
+            seatElement.classList.remove('selected');
+            document.getElementById('quantity-selector').style.display = 'none';
+        }
+
+        updateDisplay();
+    }
+
+    function updateDisplay() {
+        // Update quantity display
+        document.getElementById('regular-quantity').textContent = regularQuantity;
+
+        // Update hidden form input
+        document.getElementById('selected-quantity').value = regularQuantity;
+
+        // Update total price
+        totalPrice = regularQuantity * ticketPrice;
+
+        // Update button states
+        const minusBtn = document.querySelector('.quantity-btn');
+        const plusBtn = document.querySelectorAll('.quantity-btn')[1];
+
+        minusBtn.disabled = regularQuantity <= 0;
+        plusBtn.disabled = regularQuantity >= maxAvailable || regularQuantity >= 8;
+
+        // Update summary
+        updateSummary();
+    }
+
+    function updateSummary() {
+        const selectedTicketsDiv = document.getElementById('selected-tickets');
+        const emptySelection = document.getElementById('empty-selection');
+        const pricingBreakdown = document.getElementById('pricing-breakdown');
+        const totalAmountSpan = document.getElementById('total-amount');
+        const checkoutBtn = document.getElementById('checkout-btn');
+
+        if (regularQuantity > 0) {
+            // Hide empty selection message
+            console.log('Hide empty selection message: ' + emptySelection);
+            if (emptySelection) {
+                emptySelection.style.display = 'none';
+            }
+
+            // Show selected tickets
+            selectedTicketsDiv.innerHTML = `
+                <div class="ticket-item">
+                    <div class="ticket-info">
+                        🎪 Regular Section × ${regularQuantity}
+                    </div>
+                    <div class="ticket-price">$${(regularQuantity * ticketPrice).toFixed(2)}</div>
+                </div>
+            `;
+
+            // Show pricing breakdown
+            console.log('pricingBreakdown: ' + pricingBreakdown);
+
+            pricingBreakdown.style.display = 'block';
+            totalAmountSpan.textContent = `$${totalPrice.toFixed(2)}`;
+
+            // Enable checkout button
+            checkoutBtn.disabled = false;
+        } else {
+            // Show empty selection
+            console.log('emptySelection: ' + emptySelection);
+
+            emptySelection.style.display = 'block';
+            selectedTicketsDiv.innerHTML = '<div class="empty-selection" id="empty-selection">No tickets selected yet. Choose tickets from the left to see your summary.</div>';
+
+            // Hide pricing breakdown
+            console.log('pricingBreakdown: 771 ' + pricingBreakdown);
+            pricingBreakdown.style.display = 'none';
+
+            // Disable checkout button
+            checkoutBtn.disabled = true;
+        }
+    }
+
+    // Initialize the interface on page load
+    document.addEventListener('DOMContentLoaded', function () {
+        // Mark as unavailable if no tickets left
+        if (maxAvailable === 0) {
+            const seatElement = document.getElementById('regular-seat-type');
+            seatElement.classList.add('unavailable');
+        }
+
+        // Initialize display
+        updateDisplay();
+
+        // Prevent form submission if no tickets selected
+        document.getElementById('booking-form').addEventListener('submit', function(e) {
+            if (regularQuantity === 0) {
+                e.preventDefault();
+                alert('Please select at least one ticket before proceeding.');
+            }
+        });
+    });
+</script>
+</body>
+</html>

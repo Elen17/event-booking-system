@@ -4,13 +4,8 @@ import com.epam.campstone.eventbookingsystem.dto.CategoryOptionDto;
 import com.epam.campstone.eventbookingsystem.dto.EventDto;
 import com.epam.campstone.eventbookingsystem.dto.EventSearchDto;
 import com.epam.campstone.eventbookingsystem.exception.ResourceNotFoundException;
-import com.epam.campstone.eventbookingsystem.model.City;
-import com.epam.campstone.eventbookingsystem.model.Event;
-import com.epam.campstone.eventbookingsystem.model.Venue;
-import com.epam.campstone.eventbookingsystem.repository.CityRepository;
-import com.epam.campstone.eventbookingsystem.repository.EventRepository;
-import com.epam.campstone.eventbookingsystem.repository.EventTypeRepository;
-import com.epam.campstone.eventbookingsystem.repository.VenueRepository;
+import com.epam.campstone.eventbookingsystem.model.*;
+import com.epam.campstone.eventbookingsystem.repository.*;
 import com.epam.campstone.eventbookingsystem.service.api.EventService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,15 +24,21 @@ public class EventServiceImpl implements EventService {
     private final CityRepository cityRepository;
     private final VenueRepository venueRepository;
     private final EventTypeRepository eventTypeRepository;
+    private final UserRepository userRepository;
+    private final EventStatusRepository eventStatusRepository;
 
     public EventServiceImpl(EventRepository eventRepository,
                             CityRepository cityRepository,
                             VenueRepository venueRepository,
-                            EventTypeRepository eventTypeRepository) {
+                            EventTypeRepository eventTypeRepository,
+                            UserRepository userRepository,
+                            EventStatusRepository eventStatusRepository) {
         this.venueRepository = venueRepository;
         this.cityRepository = cityRepository;
         this.eventRepository = eventRepository;
         this.eventTypeRepository = eventTypeRepository;
+        this.userRepository = userRepository;
+        this.eventStatusRepository = eventStatusRepository;
     }
 
     @Override
@@ -105,7 +106,7 @@ public class EventServiceImpl implements EventService {
     @Override
     public List<CategoryOptionDto> getCategoryOptions() {
         return eventTypeRepository.findAll().stream()
-                .map(eventType -> new CategoryOptionDto(eventType.getName(), eventType.getDisplayName()))
+                .map(eventType -> new CategoryOptionDto(eventType.getId(), eventType.getName(), eventType.getDisplayName()))
                 .toList();
     }
 
@@ -134,6 +135,11 @@ public class EventServiceImpl implements EventService {
         entity.setDescription(dto.getDescription());
         entity.setEventDate(dto.getEventDate().toLocalDate());
         entity.setStartTime(dto.getEventDate().toLocalTime());
+        entity.setMinPrice(dto.getPrice());
+
+        EventType eventType = this.eventTypeRepository.findById(dto.getCategory())
+                .orElseThrow(() -> new ResourceNotFoundException("Event type not found with name: " + dto.getCategory()));
+        entity.setType(eventType);
 
         Venue venue = new Venue();
         venue.setName(dto.getVenue().getName());
@@ -146,6 +152,13 @@ public class EventServiceImpl implements EventService {
 
         entity.setVenue(venue);
         entity.setAvailableAttendeesCapacity(dto.getAvailableAttendeesCapacity());
+        User createdBy = this.userRepository.findById(dto.getCreatedBy())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + dto.getCreatedBy()));
+        entity.setCreatedBy(createdBy);
+
+        // todo implement status logic for events
+        // for now set status to PLANNED always
+        entity.setStatus(this.eventStatusRepository.findByName("PLANNED").orElseThrow(() -> new ResourceNotFoundException("Status not found with name: PLANNED")));
     }
 
 }

@@ -43,10 +43,6 @@ public class Event {
     private LocalTime startTime;
 
     @NotNull
-    @Column(name = "end_time", nullable = false)
-    private LocalTime endTime;
-
-    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "status_id", nullable = false)
     private EventStatus status;
