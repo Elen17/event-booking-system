@@ -104,10 +104,10 @@ public class BookingServiceImpl implements BookingService {
         booking.setSeats(Collections.emptySet());
 
         // set status for seats available
-        this.seatRepository.updateSeatsStatus(seats, seatStatusRepository.findByName("AVAILABLE").get());
+        this.seatRepository.updateSeatsStatus(seats, seatStatusRepository.findByName("AVAILABLE").orElseThrow(() -> new IllegalArgumentException("Seat status not found")));
 
         // Update booking status
-        booking.setBookingStatus(bookingStatusRepository.findByName("CANCELLED").get());
+        booking.setBookingStatus(bookingStatusRepository.findByName("CANCELLED").orElseThrow(() -> new IllegalArgumentException("Booking status not found")));
         bookingRepository.save(booking);
 
         // Return tickets to available capacity
@@ -134,11 +134,6 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<Booking> findUserBookingsByStatus(String username, BookingStatus bookingStatus) {
         return this.bookingRepository.findByUserFilteredByStatus(username, bookingStatus.name());
-    }
-
-    private BigDecimal calculateTotalPrice(List<SeatDto> seats) {
-        return seats.stream()
-                .map(SeatDto::getBasePrice).reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     private Set<Seat> createSeats(@NotNull(message = "Seats are required") List<SeatDto> seats) {

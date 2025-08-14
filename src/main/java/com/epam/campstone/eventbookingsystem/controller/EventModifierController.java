@@ -141,6 +141,7 @@ public class EventModifierController {
      * @param redirectAttributes Attributes for flash messages during redirection.
      * @return A redirection to the events list on success, or to the event edit form on error.
      */
+    // TODO: implement event update
     @PostMapping("/{id}")
     public String updateEvent(
             @PathVariable Long id,

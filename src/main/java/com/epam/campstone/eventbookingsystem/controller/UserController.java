@@ -4,7 +4,6 @@ import com.epam.campstone.eventbookingsystem.dto.BookingStatus;
 import com.epam.campstone.eventbookingsystem.dto.CountryDto;
 import com.epam.campstone.eventbookingsystem.dto.UserProfileDto;
 import com.epam.campstone.eventbookingsystem.model.Booking;
-import com.epam.campstone.eventbookingsystem.model.Country;
 import com.epam.campstone.eventbookingsystem.model.User;
 import com.epam.campstone.eventbookingsystem.service.api.BookingService;
 import com.epam.campstone.eventbookingsystem.service.api.CountryService;
@@ -28,14 +27,11 @@ public class UserController {
 
     private final UserService userService;
     private final BookingService bookingService;
-    private final CountryService countryService;
 
     public UserController(UserService userService,
-                          BookingService bookingService,
-                          CountryService countryService) {
+                          BookingService bookingService) {
         this.userService = userService;
         this.bookingService = bookingService;
-        this.countryService = countryService;
     }
 
     @GetMapping("/profile")
@@ -58,7 +54,7 @@ public class UserController {
 
     @PostMapping("/profile")
     public String updateProfile(@Valid @ModelAttribute UserProfileDto userProfile,
-                                BindingResult result, Model model,
+                                BindingResult result,
                                 RedirectAttributes redirectAttributes) {
         log.info("Updating profile for user: {}", userProfile.getEmail());
 
@@ -81,9 +77,11 @@ public class UserController {
 
     @GetMapping("/change-password")
     public String showChangePasswordForm() {
+        // todo
         return "user/change-password";
     }
 
+    // todo: dummy implementation
     @PostMapping("/change-password")
     public String changePassword(
             @RequestParam("currentPassword") String currentPassword,

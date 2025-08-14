@@ -13,11 +13,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 @Controller
 @Slf4j
@@ -114,7 +112,7 @@ public class HomeController {
     private void addCommonModelAttributes(Model model) {
         User user = (User) model.getAttribute("user");
         // Add available cities for search dropdown
-        List<String> cities = this.cityService.findByCountry(user.getCountry())
+        List<String> cities = this.cityService.findByCountry(Objects.requireNonNull(user).getCountry())
                 .stream().map(City::getName)
                 .toList();
 

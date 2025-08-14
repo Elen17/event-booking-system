@@ -1,7 +1,6 @@
 package com.epam.campstone.eventbookingsystem.controller;
 
 import com.epam.campstone.eventbookingsystem.dto.BookingDto;
-import com.epam.campstone.eventbookingsystem.dto.SeatDto;
 import com.epam.campstone.eventbookingsystem.model.Booking;
 import com.epam.campstone.eventbookingsystem.model.Event;
 import com.epam.campstone.eventbookingsystem.model.User;
@@ -79,8 +78,7 @@ public class BookingController {
             BindingResult bindingResult,
             @AuthenticationPrincipal UserDetails currentUser,
             @RequestParam(value = "ticketQuantity", defaultValue = "0") int quantity,
-            RedirectAttributes redirectAttributes,
-            Model model) {
+            RedirectAttributes redirectAttributes) {
 
         log.info("Creating booking for user: {}, event: {}, tickets: {}",
                 currentUser.getUsername(), bookingDto.getEventId(), quantity);
