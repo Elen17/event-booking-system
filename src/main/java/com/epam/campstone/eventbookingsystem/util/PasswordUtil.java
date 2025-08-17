@@ -7,7 +7,7 @@ import java.security.SecureRandom;
 import java.util.Base64;
 
 public class PasswordUtil {
-    private static final String HASH_ALGORITHM = "bcrypt";
+    private static final String HASH_ALGORITHM = "SHA-256";
     private static final int SALT_LENGTH = 16;
     private static final SecureRandom RANDOM = new SecureRandom();
 

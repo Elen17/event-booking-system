@@ -43,50 +43,44 @@ public class LoginServiceImpl implements LoginService {
 
     @Override
     public JwtResponseDto authenticateUser(LoginRequestDto loginRequest) {
-        try {
-            // Authenticate user
-            log.info("Authenticating user: {}", loginRequest.getUsername());
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+        // Authenticate user
+        log.info("Authenticating user: {}", loginRequest.getUsername());
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            // Generate JWT token
-            UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-            if (!userDetails.isAccountNonLocked()) {
-                log.error("User account is locked: {}", userDetails.getUsername());
-                throw new UserNotActiveException("User account is not active");
-            }
+        // Generate JWT token
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        if (!userDetails.isAccountNonLocked()) {
+            log.error("User account is locked: {}", userDetails.getUsername());
+            throw new UserNotActiveException("User account is not active");
+        }
 
-            // check if user password is right
-            if (!PasswordUtil.verifyPassword(loginRequest.getPassword(), userDetails.getPassword(), userDetails.getSalt())) {
-                log.error("User password is incorrect: {}", userDetails.getUsername());
-                throw new AuthenticationException("Invalid email or password");
-            }
-
-            log.info("Generating JWT token for user: {}", userDetails.getUsername());
-            String jwt = jwtUtils.generateJwtToken(userDetails);
-
-            // Get user roles
-            List<String> roles = userDetails.getAuthorities().stream()
-                    .map(GrantedAuthority::getAuthority)
-                    .collect(Collectors.toList());
-
-            // Generate refresh token
-            log.info("Generating refresh token for user: {}", userDetails.getUsername());
-            String randomToken = UUID.randomUUID().toString();
-            // Return JWT response
-            return new JwtResponseDto(
-                    jwt,
-                    randomToken,
-                    userDetails.getId(),
-                    userDetails.getUsername(),
-                    roles);
-
-        } catch (org.springframework.security.core.AuthenticationException e) {
-            log.error("Authentication failed: {}", e.getMessage());
+        // check if user password is right
+        if (!PasswordUtil.verifyPassword(loginRequest.getPassword(), userDetails.getPassword(), userDetails.getSalt())) {
+            log.error("User password is incorrect: {}", userDetails.getUsername());
             throw new AuthenticationException("Invalid email or password");
         }
+
+        log.info("Generating JWT token for user: {}", userDetails.getUsername());
+        String jwt = jwtUtils.generateJwtToken(userDetails);
+
+        // Get user roles
+        List<String> roles = userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList());
+
+        // Generate refresh token
+        log.info("Generating refresh token for user: {}", userDetails.getUsername());
+        String randomToken = UUID.randomUUID().toString();
+        // Return JWT response
+        return new JwtResponseDto(
+                jwt,
+                randomToken,
+                userDetails.getId(),
+                userDetails.getUsername(),
+                roles);
     }
 
     @Override

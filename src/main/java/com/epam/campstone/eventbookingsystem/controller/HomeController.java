@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 import java.util.Objects;
@@ -34,7 +35,8 @@ public class HomeController {
     }
 
     @GetMapping("/")
-    public String home(Model model, Authentication authentication) {
+    public String home(Model model, RedirectAttributes redirectAttributes,
+                       Authentication authentication) {
         log.info("Accessing home page");
 
         // Add user info if authenticated
@@ -60,6 +62,8 @@ public class HomeController {
             log.info("Authenticated user {} accessing home page", user.getEmail());
         } else {
             log.info("Anonymous user accessing home page");
+            redirectAttributes.addFlashAttribute("notLoggedIn", "User is not logged in");
+            return "redirect:/auth/login";
         }
 
         return "home/dashboard";

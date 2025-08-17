@@ -6,12 +6,12 @@ import com.epam.campstone.eventbookingsystem.model.Country;
 import com.epam.campstone.eventbookingsystem.service.api.CountryService;
 import com.epam.campstone.eventbookingsystem.service.api.RegistrationService;
 import com.epam.campstone.eventbookingsystem.service.api.UserService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -43,9 +43,9 @@ public class AuthController {
      * present, a success message is added to the model. The method then returns
      * the login form view.
      *
-     * @param error     the error query parameter
-     * @param logout    the logout query parameter
-     * @param model     the model to add attributes to
+     * @param error  the error query parameter
+     * @param logout the logout query parameter
+     * @param model  the model to add attributes to
      * @return the login form view
      */
     @GetMapping("/login")
@@ -57,8 +57,6 @@ public class AuthController {
 
         // Add empty login request object for form binding
         if (!model.containsAttribute("loginRequest")) {
-
-
             model.addAttribute("loginRequest", new LoginRequestDto());
         }
 
@@ -107,33 +105,35 @@ public class AuthController {
      * Handles user registration by validating input data and creating a new user account.
      *
      * @param userRegistrationDto The user registration data transfer object containing user details.
-     * @param bindingResult The binding result to hold validation errors.
-     * @param redirectAttributes Attributes for flash messages during redirection.
+     * @param bindingResult       The binding result to hold validation errors.
+     * @param redirectAttributes  Attributes for flash messages during redirection.
      * @return A redirection to the registration page if validation fails, or to the login page if registration is successful.
      */
     @PostMapping("/register")
     public String registerUser(@ModelAttribute("userRegistrationDto") @Valid UserRegistrationDto userRegistrationDto,
                                BindingResult bindingResult,
+                               Model model,
                                RedirectAttributes redirectAttributes) {
 
         // Check for passwords match
         if (!userRegistrationDto.getPassword().equals(userRegistrationDto.getConfirmPassword())) {
             log.info("Passwords do not match");
-            bindingResult.rejectValue("confirmPassword", "error.userRegistrationDto", "Passwords do not match");
+            bindingResult.rejectValue("confirmPassword","Passwords do not match", "Passwords do not match");
         }
 
         // Check if email already exists
         if (userService.existsByEmail(userRegistrationDto.getEmail())) {
             log.info("Email is already in use by another user");
-            bindingResult.rejectValue("email", "error.userRegistrationDto", "Email is already in use");
+            bindingResult.rejectValue("email", "Email is already in use", "Email is already in use");
         }
 
         if (bindingResult.hasErrors()) {
             log.info("Validation errors: {}", bindingResult.getAllErrors());
-            redirectAttributes.addFlashAttribute(
-                    "org.springframework.validation.BindingResult.userRegistrationDto",
-                    bindingResult);
-            redirectAttributes.addFlashAttribute("userRegistrationDto", userRegistrationDto);
+
+            for (FieldError key : bindingResult.getFieldErrors()) {
+                redirectAttributes.addFlashAttribute(key.getField(), key.getDefaultMessage());
+                model.addAttribute(key.getField(), key.getDefaultMessage());
+            }
             return "auth/register";
         }
 

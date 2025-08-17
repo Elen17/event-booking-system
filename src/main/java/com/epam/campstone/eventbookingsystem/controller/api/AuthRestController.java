@@ -34,9 +34,11 @@ public class AuthRestController {
      */
     @PostMapping("/login")
     public ResponseEntity<JwtResponseDto> processLogin(@Valid @ModelAttribute("loginRequest") LoginRequestDto loginRequest) {
+        if (loginRequest == null) {
+            return ResponseEntity.badRequest().build();
+        }
         return ResponseEntity.ok(loginService.authenticateUser(loginRequest));
     }
-
 
 
     /**
@@ -47,6 +49,9 @@ public class AuthRestController {
      */
     @PostMapping("/logout")
     public ResponseEntity<String> logoutUser(@Valid @RequestBody TokenRefreshRequest request) {
+        if (request == null) {
+            return ResponseEntity.badRequest().body("Token refresh request is null");
+        }
         this.loginService.logoutUser(request.getRefreshToken());
         return ResponseEntity.ok("Log out successful!");
     }

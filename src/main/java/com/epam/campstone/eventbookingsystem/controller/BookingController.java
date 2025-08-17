@@ -120,7 +120,8 @@ public class BookingController {
             redirectAttributes.addFlashAttribute("successMessage",
                     "Booking confirmed! Your booking ID is: " + booking.getId());
 
-            return "redirect:/bookings/" + booking.getId();
+//            return "redirect:/bookings/" + booking.getId();
+            return "redirect:/dashboard";/*/" + booking.getId()*/
 
         } catch (IllegalArgumentException e) {
             log.warn("Invalid booking request: {}", e.getMessage());

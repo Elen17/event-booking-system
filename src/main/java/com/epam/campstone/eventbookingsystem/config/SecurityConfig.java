@@ -17,6 +17,8 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 
+import java.nio.charset.StandardCharsets;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -33,14 +35,12 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http, HandlerMappingIntrospector introspector) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http
                 .authorizeHttpRequests(auth -> auth
                         // Public resources
                         .requestMatchers(
-                                "/",
-                                "/home",
                                 "/auth/login",           // Your login form page
                                 "/auth/register",        // Registration page if you have one
                                 "/css/**",
@@ -81,13 +81,13 @@ public class SecurityConfig {
         return http.build();
     }
 
-    @Bean
-    public DaoAuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService);
-        authProvider.setPasswordEncoder(passwordEncoder());
-        return authProvider;
-    }
+//    @Bean
+//    public DaoAuthenticationProvider authenticationProvider() {
+//        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+//        authProvider.setUserDetailsService(userDetailsService);
+//        authProvider.setPasswordEncoder(passwordEncoder());
+//        return authProvider;
+//    }
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
@@ -113,7 +113,7 @@ public class SecurityConfig {
             if (exception.getMessage().contains("not active")) {
                 errorMessage = "Your account is not active. Please check your email to activate it.";
             }
-            response.sendRedirect("/auth/login?error=true&message=" + java.net.URLEncoder.encode(errorMessage, "UTF-8"));
+            response.sendRedirect("/auth/login?error=true&message=" + java.net.URLEncoder.encode(errorMessage, StandardCharsets.UTF_8));
         };
     }
 }
