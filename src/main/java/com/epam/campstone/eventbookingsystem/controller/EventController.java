@@ -2,6 +2,7 @@ package com.epam.campstone.eventbookingsystem.controller;
 
 import com.epam.campstone.eventbookingsystem.dto.CategoryOptionDto;
 import com.epam.campstone.eventbookingsystem.dto.EventSearchDto;
+import com.epam.campstone.eventbookingsystem.exception.EventNotFoundException;
 import com.epam.campstone.eventbookingsystem.model.City;
 import com.epam.campstone.eventbookingsystem.model.Event;
 import com.epam.campstone.eventbookingsystem.model.User;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -99,7 +102,9 @@ public class EventController {
         log.info("Viewing event: {}", id);
 
         Event event = eventService.findById(id)
-                .orElseThrow(() -> new RuntimeException("Event not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found"));
+
+
         model.addAttribute("event", event);
         return "events/view";
     }
@@ -169,7 +174,7 @@ public class EventController {
         return "home/dashboard";
     }
 
-    @GetMapping("/events")
+    @GetMapping("/all")
     public String listAllEvents(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "12") int size,

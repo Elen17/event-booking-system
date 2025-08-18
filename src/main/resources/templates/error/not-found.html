@@ -1,0 +1,6 @@
+<html xmlns:th="http://www.thymeleaf.org"
+xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+layout:decorate="~{layout}">
+<head><title>Not Found</title></head>
+<body><h1 th:text="${errorMessage ?: 'Not Found'}"></h1></body>
+</html>

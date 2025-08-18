@@ -45,9 +45,6 @@ class HomeControllerTest {
     @Mock
     private CityService cityService;
 
-    @Mock
-    private PasswordUtil passwordUtil;
-
     @InjectMocks
     private HomeController homeController;
 
@@ -66,12 +63,6 @@ class HomeControllerTest {
         initCities();
         initValidUser();
         initEvents();
-    }
-
-    private void initCountries() {
-        testCountry = new Country();
-        testCountry.setId(1);
-        testCountry.setName("United States");
     }
 
     @Test
@@ -99,7 +90,6 @@ class HomeControllerTest {
                     .thenReturn(true);
 
             Authentication auth = new UsernamePasswordAuthenticationToken("test@example.com", "password", Collections.emptyList());
-//            auth.setAuthenticated(true);
 
             mockMvc.perform(get("/").principal(auth))
                     .andExpect(status().isOk())
@@ -131,6 +121,12 @@ class HomeControllerTest {
                 exception.getCause().getMessage());
 
         verify(userService, times(1)).findByEmail("nonexistent@example.com");
+    }
+
+    private void initCountries() {
+        testCountry = new Country();
+        testCountry.setId(1);
+        testCountry.setName("United States");
     }
 
     private void initEvents() {

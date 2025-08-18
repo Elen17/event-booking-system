@@ -3,6 +3,7 @@ package com.epam.campstone.eventbookingsystem.controller.api;
 import com.epam.campstone.eventbookingsystem.dto.JwtResponseDto;
 import com.epam.campstone.eventbookingsystem.dto.LoginRequestDto;
 import com.epam.campstone.eventbookingsystem.dto.TokenRefreshRequest;
+import com.epam.campstone.eventbookingsystem.exception.AuthenticationException;
 import com.epam.campstone.eventbookingsystem.service.api.LoginService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +38,12 @@ public class AuthRestController {
         if (loginRequest == null) {
             return ResponseEntity.badRequest().build();
         }
-        return ResponseEntity.ok(loginService.authenticateUser(loginRequest));
+        try {
+            JwtResponseDto jwtResponse = loginService.authenticateUser(loginRequest);
+            return ResponseEntity.ok(jwtResponse);
+        } catch (AuthenticationException e) {
+            return ResponseEntity.badRequest().body(null);
+        }
     }
 
 

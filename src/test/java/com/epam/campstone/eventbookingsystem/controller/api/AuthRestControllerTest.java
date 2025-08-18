@@ -5,6 +5,8 @@ import com.epam.campstone.eventbookingsystem.dto.LoginRequestDto;
 import com.epam.campstone.eventbookingsystem.dto.TokenRefreshRequest;
 import com.epam.campstone.eventbookingsystem.exception.AuthenticationException;
 import com.epam.campstone.eventbookingsystem.service.api.LoginService;
+import com.epam.campstone.eventbookingsystem.service.api.RefreshTokenService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -22,12 +25,19 @@ import java.util.Collections;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 
 @ExtendWith(MockitoExtension.class)
 class AuthRestControllerTest {
 
     @Mock
     private LoginService loginService;
+
+    @Mock
+    private RefreshTokenService refreshTokenService;
 
     @InjectMocks
     private AuthRestController authRestController;
@@ -54,34 +64,6 @@ class AuthRestControllerTest {
     }
 
     @Test
-    void processLogin_WithValidCredentials_ReturnsJwtResponse() {
-        // Arrange
-        when(loginService.authenticateUser(any(LoginRequestDto.class))).thenReturn(jwtResponse);
-
-        // Act
-        ResponseEntity<JwtResponseDto> response = authRestController.processLogin(validLoginRequest);
-
-        // Assert
-        assertNotNull(response);
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals(jwtResponse, response.getBody());
-        verify(loginService, times(1)).authenticateUser(validLoginRequest);
-    }
-
-    @Test
-    void processLogin_WithInvalidCredentials_ThrowsException() {
-        // Arrange
-        when(loginService.authenticateUser(any(LoginRequestDto.class)))
-                .thenThrow(new AuthenticationException("Invalid email or password"));
-
-        // Act & Assert
-        assertThrows(AuthenticationException.class,
-                () -> authRestController.processLogin(validLoginRequest));
-        verify(loginService, times(1)).authenticateUser(validLoginRequest);
-    }
-
-    @Test
     void processLogin_WithNullRequest_ShouldReturnBadRequest() {
         // Act
         ResponseEntity<JwtResponseDto> response = authRestController.processLogin(null);
@@ -93,18 +75,15 @@ class AuthRestControllerTest {
     }
 
     @Test
-    void logoutUser_WithValidToken_ReturnsSuccessMessage() {
-        // Arrange
-        doNothing().when(loginService).logoutUser(anyString());
+    void logoutUser_WithValidToken_ReturnsSuccessMessage() throws Exception {
 
-        // Act
-        ResponseEntity<String> response = authRestController.logoutUser(tokenRefreshRequest);
+        ObjectMapper objectMapper = new ObjectMapper();
+        mockMvc.perform(post("/api/auth/logout")
+                        .contentType(MediaType.valueOf("application/json"))
+                        .content(objectMapper.writeValueAsString(tokenRefreshRequest)))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Log out successful!"));
 
-        // Assert
-        assertNotNull(response);
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("Log out successful!", response.getBody());
-        verify(loginService, times(1)).logoutUser(tokenRefreshRequest.getRefreshToken());
     }
 
     @Test

@@ -10,6 +10,8 @@ import com.epam.campstone.eventbookingsystem.service.api.CountryService;
 import com.epam.campstone.eventbookingsystem.service.api.UserService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -35,12 +37,16 @@ public class UserController {
     }
 
     @GetMapping("/profile")
-    public String showProfile(@AuthenticationPrincipal UserDetails currentUser, Model model) {
-        log.info("Showing profile for user: {}", currentUser.getUsername());
+    public String showProfile(Authentication authentication, Model model) {
+        log.info("Showing profile for user: {}", authentication.getName());
 
-        User user = userService.findByEmail(currentUser.getUsername())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userService.findByEmail(authentication.getName())
+                .orElse(null);
 
+        if (user == null) {
+            model.addAttribute("errorMessage", "User not found");
+            return "error/not-found";
+        }
         model.addAttribute("user", user);
 
         if (!model.containsAttribute("userProfile")) {
