@@ -413,29 +413,6 @@
             }
         }
     </style>
-    <script th:inline="javascript">
-        function openEventModal(eventId) {
-            // Redirect to event details page
-            window.location.href = /*[[@{/events/}]]*/ '/events/' + eventId;
-        }
-
-        function bookEvent(eventId) {
-            // Redirect to booking page
-            window.location.href = /*[[@{/events/}]]*/ '/events/' + eventId + '/book';
-        }
-
-        // Auto-submit search form when filters change (optional)
-        function enableAutoSearch() {
-            const searchForm = document.querySelector('form[action*="/search"]');
-            const inputs = searchForm.querySelectorAll('select, input[type="date"]');
-
-            inputs.forEach(input => {
-                input.addEventListener('change', () => {
-                    searchForm.submit();
-                });
-            });
-        }
-    </script>
 </head>
 <body>
 <div class="container">

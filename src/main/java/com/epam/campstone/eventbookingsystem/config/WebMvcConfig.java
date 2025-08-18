@@ -31,6 +31,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
         
         // Error pages
         registry.addViewController("/error/access-denied").setViewName("error/access-denied");
+
+        // todo add templates
         registry.addViewController("/error/not-found").setViewName("error/not-found");
         registry.addViewController("/error/error").setViewName("error/error");
     }

@@ -4,6 +4,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ticketo - Login</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
     <style>
         * {
             margin: 0;
@@ -172,22 +173,6 @@
             text-align: center;
         }
 
-        .success-message {
-            background: rgba(46, 204, 113, 0.2);
-            border: 1px solid #2ecc71;
-            color: #2ecc71;
-            padding: 10px 15px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            font-size: 14px;
-            text-align: center;
-        }
-
-        .field-error {
-            border-color: #e74c3c !important;
-            box-shadow: 0 0 20px rgba(231, 76, 60, 0.3) !important;
-        }
-
         .field-error-message {
             color: #e74c3c;
             font-size: 12px;
@@ -204,12 +189,6 @@
             .logo h1 {
                 font-size: 2em;
             }
-        }
-
-        /* Loading animation */
-        .loading {
-            opacity: 0.7;
-            pointer-events: none;
         }
 
         .loading .login-btn {
